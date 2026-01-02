@@ -1,0 +1,6 @@
+# Ignore datasets (VERY IMPORTANT)
+dataset/
+
+# Ignore large data formats anywhere
+*.jsonl
+*.csv
