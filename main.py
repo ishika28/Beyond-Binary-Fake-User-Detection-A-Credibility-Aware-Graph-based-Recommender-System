@@ -10,6 +10,9 @@ from collections import defaultdict
 
 # --- Code cell 3 ---
 import json
+import math
+import pickle
+from pathlib import Path
 
 path = "dataset/Clothing_Shoes_and_Jewelry.jsonl"
 
@@ -405,7 +408,334 @@ with open(IN_JSONL, "r", encoding="utf-8") as fin, open(OUT_JSONL, "w", encoding
 
 print("Saved:", OUT_JSONL)
 print("Missing-feature rows:", missing)
+JSONL_PATH = "dataset/Clothing_Shoes_and_Jewelry_with_labels_and_features.jsonl"
+OUT_DIR = Path("dataset/graph_pyg_rates")
 
-# --- Code cell 14 ---
+# 6 engineered features + Ru (already inside each JSONL row)
+USER_FEATURE_KEYS = [
+    "Ru",
+    "rating_entropy",
+    "extremity_ratio",
+    "average_rating_deviation",
+    "review_burst_count",
+    "lexical_diversity",
+    "review_length_discrepancy",
+]
+
+# User labels for GraphSAGE user classification
+# -1 means unlabeled (mask in loss)
+LABEL_TO_INT = {"fake": 0, "genuine": 1, "unlabeled": -1}
+
+# Edge attributes (EWA-ready)
+EDGE_ATTR_KEYS = ["verified", "rating_align", "rating", "timestamp_norm", "helpful_vote"]
+
+# Timestamp normalization
+NORMALIZE_TIMESTAMP = True
+
+# Disk/RAM-friendly dtypes
+IDX_DTYPE = np.int32
+F_DTYPE = np.float32
+
+PRINT_EVERY = 1_000_000
+
+# =========================
+# Helpers
+# =========================
+def safe_float(x):
+    if x is None:
+        return np.nan
+    try:
+        return float(x)
+    except Exception:
+        return np.nan
+
+def safe_int(x, default=None):
+    try:
+        return int(x)
+    except Exception:
+        return default
+
+def ensure_outdir():
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+def calc_rating_align(r_ui: float, rbar_i: float):
+    # RatingAlign_{u,i} = 1 - |r_ui - rbar_i| / 4
+    # assuming rating scale 1..5
+    if r_ui is None or rbar_i is None or math.isnan(r_ui) or math.isnan(rbar_i):
+        return np.nan
+    return 1.0 - (abs(float(r_ui) - float(rbar_i)) / 4.0)
+
+# =========================
+# PASS 1
+# Build:
+# - user2idx, item2idx
+# - user_x (Ru + 6 features)
+# - user_y (fake/genuine, unlabeled=-1)
+# - item_mean_rating, item_count -> item_x
+# - timestamp min/max
+# - edge_count E
+# =========================
+def pass1_build_maps_and_stats(jsonl_path: str):
+    user2idx = {}
+    item2idx = {}
+
+    user_feat_rows = []
+    user_y = []
+
+    item_sum = []
+    item_cnt = []
+
+    ts_min, ts_max = None, None
+    E = 0
+
+    with open(jsonl_path, "r", encoding="utf-8") as f:
+        for i, line in enumerate(f, 1):
+            r = json.loads(line)
+
+            uid = r.get("user_id")
+            asin = r.get("asin")
+            rating = r.get("rating")
+
+            # For "rates" edge, rating must exist:
+            if uid is None or asin is None or rating is None:
+                continue
+
+            # user mapping
+            uidx = user2idx.get(uid)
+            if uidx is None:
+                uidx = len(user2idx)
+                user2idx[uid] = uidx
+                user_feat_rows.append([np.nan] * len(USER_FEATURE_KEYS))
+
+                lab = r.get("label", "unlabeled")
+                user_y.append(LABEL_TO_INT.get(lab, -1))
+
+            # fill user features once
+            row = user_feat_rows[uidx]
+            for j, k in enumerate(USER_FEATURE_KEYS):
+                if math.isnan(row[j]):
+                    row[j] = safe_float(r.get(k))
+
+            # item mapping
+            iidx = item2idx.get(asin)
+            if iidx is None:
+                iidx = len(item2idx)
+                item2idx[asin] = iidx
+                item_sum.append(0.0)
+                item_cnt.append(0)
+
+            # item mean accumulators
+            r_ui = safe_float(rating)
+            if not math.isnan(r_ui):
+                item_sum[iidx] += r_ui
+                item_cnt[iidx] += 1
+
+            # timestamp range
+            ts = r.get("timestamp")
+            if ts is not None:
+                ts = safe_int(ts)
+                if ts is not None:
+                    ts_min = ts if ts_min is None else min(ts_min, ts)
+                    ts_max = ts if ts_max is None else max(ts_max, ts)
+
+            E += 1
+
+            if i % PRINT_EVERY == 0:
+                print(f"PASS1 {i:,} lines | users={len(user2idx):,} items={len(item2idx):,} edges={E:,}")
+
+    user_x = np.asarray(user_feat_rows, dtype=F_DTYPE)
+    user_y = np.asarray(user_y, dtype=np.int64)
+
+    item_sum = np.asarray(item_sum, dtype=np.float64)
+    item_cnt = np.asarray(item_cnt, dtype=np.int64)
+
+    item_mean = (item_sum / np.maximum(item_cnt, 1)).astype(F_DTYPE)
+    item_cnt_f = item_cnt.astype(F_DTYPE)
+
+    # item node features: [mean_rating, rating_count]
+    item_x = np.stack([item_mean, item_cnt_f], axis=1).astype(F_DTYPE)
+
+    stats = {
+        "E": int(E),
+        "ts_min": ts_min,
+        "ts_max": ts_max,
+        "num_users": int(user_x.shape[0]),
+        "num_items": int(item_x.shape[0]),
+    }
+
+    print("\nPASS1 done:", stats)
+    return user2idx, item2idx, user_x, user_y, item_mean, item_x, stats
+
+# =========================
+# PASS 2
+# Write edges to memmaps:
+# - u2i_src, u2i_dst
+# - u2i_attr: verified, rating_align, rating, timestamp_norm, helpful_vote
+# =========================
+def pass2_write_edges(jsonl_path: str, user2idx, item2idx, item_mean, stats):
+    ensure_outdir()
+
+    E = stats["E"]
+    ts_min, ts_max = stats["ts_min"], stats["ts_max"]
+
+    src_path = OUT_DIR / "u2i_src.mmap"
+    dst_path = OUT_DIR / "u2i_dst.mmap"
+    attr_path = OUT_DIR / "u2i_attr.mmap"
+
+    src = np.memmap(src_path, dtype=IDX_DTYPE, mode="w+", shape=(E,))
+    dst = np.memmap(dst_path, dtype=IDX_DTYPE, mode="w+", shape=(E,))
+    attr = np.memmap(attr_path, dtype=F_DTYPE, mode="w+", shape=(E, len(EDGE_ATTR_KEYS)))
+
+    def norm_ts(ts):
+        if not NORMALIZE_TIMESTAMP:
+            return safe_float(ts)
+        if ts_min is None or ts_max is None or ts_max == ts_min:
+            return np.nan
+        return (ts - ts_min) / (ts_max - ts_min)
+
+    e = 0
+    with open(jsonl_path, "r", encoding="utf-8") as f:
+        for i, line in enumerate(f, 1):
+            r = json.loads(line)
+
+            uid = r.get("user_id")
+            asin = r.get("asin")
+            rating = r.get("rating")
+
+            if uid is None or asin is None or rating is None:
+                continue
+
+            uidx = user2idx.get(uid)
+            iidx = item2idx.get(asin)
+            if uidx is None or iidx is None:
+                continue
+
+            src[e] = uidx
+            dst[e] = iidx
+
+            r_ui = safe_float(rating)
+            rbar_i = float(item_mean[iidx]) if iidx < len(item_mean) else np.nan
+
+            verified = 1.0 if bool(r.get("verified_purchase", False)) else 0.0
+            align = calc_rating_align(r_ui, rbar_i)
+
+            ts = r.get("timestamp")
+            ts = safe_int(ts)
+            tsn = norm_ts(ts) if ts is not None else np.nan
+
+            hv = safe_float(r.get("helpful_vote"))
+
+            values = {
+                "verified": verified,
+                "rating_align": align,
+                "rating": r_ui,
+                "timestamp_norm": tsn,
+                "helpful_vote": hv,
+            }
+            for j, k in enumerate(EDGE_ATTR_KEYS):
+                attr[e, j] = safe_float(values.get(k))
+
+            e += 1
+            if i % PRINT_EVERY == 0:
+                print(f"PASS2 {i:,} lines | edges_written={e:,}/{E:,}")
+
+    src.flush(); dst.flush(); attr.flush()
+    print("\nPASS2 done. Edge memmaps saved in:", OUT_DIR)
+
+    if e != E:
+        print(f"[WARN] Expected edges={E:,} but wrote edges={e:,}. Some rows were skipped unexpectedly.")
+
+    return str(src_path), str(dst_path), str(attr_path)
+
+# =========================
+# Save mappings (use pickle; JSON is huge)
+# =========================
+def save_mappings(user2idx, item2idx):
+    with open(OUT_DIR / "user2idx.pkl", "wb") as f:
+        pickle.dump(user2idx, f, protocol=pickle.HIGHEST_PROTOCOL)
+    with open(OUT_DIR / "item2idx.pkl", "wb") as f:
+        pickle.dump(item2idx, f, protocol=pickle.HIGHEST_PROTOCOL)
+    print("Saved mappings:", OUT_DIR / "user2idx.pkl", "and", OUT_DIR / "item2idx.pkl")
+
+# =========================
+# Export PyG HeteroData
+# =========================
+def export_pyg(user_x, user_y, item_x, src_path, dst_path, attr_path, stats):
+    import torch
+    from torch_geometric.data import HeteroData
+
+    E = stats["E"]
+
+    src = np.memmap(src_path, dtype=IDX_DTYPE, mode="r", shape=(E,))
+    dst = np.memmap(dst_path, dtype=IDX_DTYPE, mode="r", shape=(E,))
+    edge_attr = np.memmap(attr_path, dtype=F_DTYPE, mode="r", shape=(E, len(EDGE_ATTR_KEYS)))
+
+    data = HeteroData()
+
+    # nodes
+    data["user"].x = torch.from_numpy(user_x.astype(np.float32))
+    data["user"].y = torch.from_numpy(user_y.astype(np.int64))  # -1 unlabeled
+
+    data["item"].x = torch.from_numpy(item_x.astype(np.float32))
+
+    # edges user->item
+    u2i_edge_index = np.vstack([src.astype(np.int64), dst.astype(np.int64)])
+    data[("user", "rates", "item")].edge_index = torch.from_numpy(u2i_edge_index)
+    data[("user", "rates", "item")].edge_attr = torch.from_numpy(edge_attr.astype(np.float32))
+
+    # reverse edges for two-stage propagation (user->item->user)
+    i2u_edge_index = np.vstack([dst.astype(np.int64), src.astype(np.int64)])
+    data[("item", "rev_rates", "user")].edge_index = torch.from_numpy(i2u_edge_index)
+    data[("item", "rev_rates", "user")].edge_attr = data[("user", "rates", "item")].edge_attr
+
+    out_pt = OUT_DIR / "graph_hetero_rates.pt"
+    torch.save(data, out_pt)
+    print("Saved PyG graph:", out_pt)
+
+    meta = {
+        "user_feature_keys": USER_FEATURE_KEYS,
+        "edge_attr_keys": EDGE_ATTR_KEYS,
+        "label_map": LABEL_TO_INT,
+        "normalize_timestamp": NORMALIZE_TIMESTAMP,
+        "num_users": stats["num_users"],
+        "num_items": stats["num_items"],
+        "E": stats["E"],
+    }
+    with open(OUT_DIR / "graph_meta.json", "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2)
+    print("Saved meta:", OUT_DIR / "graph_meta.json")
+
+# =========================
+# MAIN
+# =========================
+def main():
+    ensure_outdir()
+
+    print("=== PASS 1/3: Build mappings + node features + item mean rating ===")
+    user2idx, item2idx, user_x, user_y, item_mean, item_x, stats = pass1_build_maps_and_stats(JSONL_PATH)
+
+    print("\n=== Save node arrays + stats ===")
+    np.save(OUT_DIR / "user_x.npy", user_x)
+    np.save(OUT_DIR / "user_y.npy", user_y)
+    np.save(OUT_DIR / "item_x.npy", item_x)
+    np.save(OUT_DIR / "item_mean.npy", item_mean)
+    with open(OUT_DIR / "stats.json", "w", encoding="utf-8") as f:
+        json.dump(stats, f, indent=2)
+    print("Saved arrays in:", OUT_DIR)
+
+    print("\n=== Save ID mappings (pickle) ===")
+    save_mappings(user2idx, item2idx)
+
+    print("\n=== PASS 2/3: Write edges + edge attributes to memmaps ===")
+    src_path, dst_path, attr_path = pass2_write_edges(JSONL_PATH, user2idx, item2idx, item_mean, stats)
+
+    print("\n=== PASS 3/3: Export PyG HeteroData ===")
+    export_pyg(user_x, user_y, item_x, src_path, dst_path, attr_path, stats)
+
+    print("\nDONE. Output folder:", OUT_DIR)
+
+if __name__ == "__main__":
+    main()
+
 
 
