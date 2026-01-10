@@ -1,18 +1,5 @@
 # lightgcn_full_pipeline.py
 # Build graph (user-item edges) from JSONL -> split -> train LightGCN -> evaluate Recall/Precision/NDCG.
-#
-# Uses:
-# - user_id as user node
-# - parent_asin as item node (recommended)
-# - implicit positives: rating >= 4
-# - deterministic random split (hash-based) so raw vs credibility uses SAME split
-#
-# Outputs saved in OUT_DIR:
-# - user2idx.pkl / item2idx.pkl
-# - train_edges.npy / val_edges.npy / test_edges.npy
-# - best_model.pt
-#
-# Requirements: numpy, torch
 
 import json
 import math
@@ -24,48 +11,46 @@ from dataclasses import dataclass
 import numpy as np
 import torch
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+
 
 # =========================
 # CONFIG
 # =========================
 @dataclass
 class CFG:
-    # data
-    jsonl_path: str = "dataset/Clothing_Shoes_and_Jewelry.jsonl"
-    out_dir: str = "dataset/lightgcn_pipeline_parent"
+    jsonl_path: str = str((SCRIPT_DIR / "dataset" / "Clothing_Shoes_and_Jewelry.jsonl").resolve())
+    out_dir: str = str((SCRIPT_DIR / "dataset" / "lightgcn_pipeline_parent").resolve())
 
     user_key: str = "user_id"
-    item_key: str = "parent_asin"  # ✅ item id
+    item_key: str = "parent_asin"
     rating_key: str = "rating"
 
     pos_rating_threshold: float = 4.0
 
-    # split ratios
     train_p: float = 0.80
     val_p: float = 0.10
     test_p: float = 0.10
 
-    # training
     seed: int = 42
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
     emb_dim: int = 64
     num_layers: int = 3
     lr: float = 1e-3
     reg: float = 1e-4
-    epochs: int = 20
+    epochs: int = 200
     batch_size: int = 4096
 
-    # evaluation
     Ks: tuple = (10, 20)
     eval_every: int = 1
 
-    # evaluation mode:
-    # - "sampled": for each user, rank 1 positive + N negatives (fast, scalable)
-    # - "full": rank against all items (can be too heavy)
     eval_mode: str = "sampled"
     sampled_negatives: int = 99
 
     print_every: int = 1_000_000
+
+    # decoding safety
+    decode_errors: str = "replace"   # "replace" (recommended) or "ignore"
 
 
 cfg = CFG()
@@ -99,7 +84,6 @@ def is_positive_interaction(rec: dict) -> bool:
 
 
 def split_bucket(uid: str, iid: str) -> str:
-    # Deterministic "random" split from hash(uid|iid)
     s = f"{uid}|{iid}".encode("utf-8")
     h = hashlib.md5(s).hexdigest()
     x = int(h[:8], 16) / 0xFFFFFFFF
@@ -112,6 +96,7 @@ def split_bucket(uid: str, iid: str) -> str:
 
 
 def save_pickle(obj, path: Path):
+    path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "wb") as f:
         pickle.dump(obj, f, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -121,95 +106,135 @@ def load_pickle(path: Path):
         return pickle.load(f)
 
 
+def ensure_paths():
+    jsonl = Path(cfg.jsonl_path)
+    if not jsonl.exists():
+        raise FileNotFoundError(
+            f"JSONL not found:\n  {jsonl}\n\n"
+            f"Current working dir: {Path.cwd()}\n"
+            f"Put the file under: {SCRIPT_DIR / 'dataset'}\n"
+            f"Or set cfg.jsonl_path to your absolute JSONL path.\n"
+        )
+
+
+def iter_jsonl_records(path: Path):
+    """
+    Streaming JSONL reader that tolerates non-UTF8 bytes.
+    - Reads bytes -> decodes with errors=replace/ignore
+    - Skips invalid JSON lines
+    """
+    bad_json = 0
+    total = 0
+
+    with open(path, "rb") as f:
+        for raw in f:
+            total += 1
+            line = raw.decode("utf-8", errors=cfg.decode_errors).strip()
+            if not line:
+                continue
+            try:
+                yield total, json.loads(line)
+            except json.JSONDecodeError:
+                bad_json += 1
+                # skip line; continue streaming
+                if bad_json <= 5:
+                    print(f"[WARN] Skipping invalid JSON at line {total}")
+                continue
+
+    if bad_json > 0:
+        print(f"[WARN] Total invalid JSON lines skipped: {bad_json:,}")
+
+
 # =========================
-# STEP 1: GRAPH CONSTRUCTION (streaming)
+# STEP 1: GRAPH CONSTRUCTION
 # =========================
 def build_graph_from_jsonl():
+    ensure_paths()
+
     out = Path(cfg.out_dir)
     out.mkdir(parents=True, exist_ok=True)
+    (out / "model").mkdir(parents=True, exist_ok=True)
+    (out / "npy").mkdir(parents=True, exist_ok=True)
 
     user2idx = {}
     item2idx = {}
     counts = {"train": 0, "val": 0, "test": 0}
     pos_edges = 0
 
-    # PASS 1: mapping + counts
-    with open(cfg.jsonl_path, "r", encoding="utf-8") as f:
-        for i, line in enumerate(f, 1):
-            rec = json.loads(line)
-            if not is_positive_interaction(rec):
-                continue
+    jsonl_path = Path(cfg.jsonl_path)
 
-            uid = rec[cfg.user_key]
-            iid = rec[cfg.item_key]
+    # PASS 1
+    for i, rec in iter_jsonl_records(jsonl_path):
+        if not is_positive_interaction(rec):
+            continue
 
-            if uid not in user2idx:
-                user2idx[uid] = len(user2idx)
-            if iid not in item2idx:
-                item2idx[iid] = len(item2idx)
+        uid = rec[cfg.user_key]
+        iid = rec[cfg.item_key]
 
-            b = split_bucket(uid, iid)
-            counts[b] += 1
-            pos_edges += 1
+        if uid not in user2idx:
+            user2idx[uid] = len(user2idx)
+        if iid not in item2idx:
+            item2idx[iid] = len(item2idx)
 
-            if i % cfg.print_every == 0:
-                print(
-                    f"PASS1 {i:,} lines | users={len(user2idx):,} items={len(item2idx):,} "
-                    f"pos_edges={pos_edges:,} train={counts['train']:,} val={counts['val']:,} test={counts['test']:,}"
-                )
+        b = split_bucket(uid, iid)
+        counts[b] += 1
+        pos_edges += 1
+
+        if i % cfg.print_every == 0:
+            print(
+                f"PASS1 {i:,} lines | users={len(user2idx):,} items={len(item2idx):,} "
+                f"pos_edges={pos_edges:,} train={counts['train']:,} val={counts['val']:,} test={counts['test']:,}"
+            )
 
     print("\nPASS1 done.")
     print("Users:", len(user2idx), "Items:", len(item2idx), "Positive edges:", pos_edges)
     print("Split counts:", counts)
 
-    # Save mappings
-    save_pickle(user2idx, out / "user2idx.pkl")
-    save_pickle(item2idx, out / "item2idx.pkl")
+    save_pickle(user2idx, out / "model" / "user2idx.pkl")
+    save_pickle(item2idx, out / "model" / "item2idx.pkl")
 
-    # PASS 2: allocate + write edges
+    # PASS 2
     train = np.empty((2, counts["train"]), dtype=np.int32)
     val = np.empty((2, counts["val"]), dtype=np.int32)
     test = np.empty((2, counts["test"]), dtype=np.int32)
     ptr = {"train": 0, "val": 0, "test": 0}
 
-    with open(cfg.jsonl_path, "r", encoding="utf-8") as f:
-        for i, line in enumerate(f, 1):
-            rec = json.loads(line)
-            if not is_positive_interaction(rec):
-                continue
+    for i, rec in iter_jsonl_records(jsonl_path):
+        if not is_positive_interaction(rec):
+            continue
 
-            uid = rec[cfg.user_key]
-            iid = rec[cfg.item_key]
-            u = user2idx[uid]
-            it = item2idx[iid]
+        uid = rec[cfg.user_key]
+        iid = rec[cfg.item_key]
+        u = user2idx[uid]
+        it = item2idx[iid]
 
-            b = split_bucket(uid, iid)
-            p = ptr[b]
-            if b == "train":
-                train[0, p] = u
-                train[1, p] = it
-            elif b == "val":
-                val[0, p] = u
-                val[1, p] = it
-            else:
-                test[0, p] = u
-                test[1, p] = it
+        b = split_bucket(uid, iid)
+        p = ptr[b]
+        if b == "train":
+            train[0, p] = u
+            train[1, p] = it
+        elif b == "val":
+            val[0, p] = u
+            val[1, p] = it
+        else:
+            test[0, p] = u
+            test[1, p] = it
 
-            ptr[b] += 1
+        ptr[b] += 1
 
-            if i % cfg.print_every == 0:
-                print(
-                    f"PASS2 {i:,} lines | wrote train={ptr['train']:,}/{counts['train']:,} "
-                    f"val={ptr['val']:,}/{counts['val']:,} test={ptr['test']:,}/{counts['test']:,}"
-                )
+        if i % cfg.print_every == 0:
+            print(
+                f"PASS2 {i:,} lines | wrote train={ptr['train']:,}/{counts['train']:,} "
+                f"val={ptr['val']:,}/{counts['val']:,} test={ptr['test']:,}/{counts['test']:,}"
+            )
 
     assert ptr["train"] == counts["train"]
     assert ptr["val"] == counts["val"]
     assert ptr["test"] == counts["test"]
 
-    np.save(out / "train_edges.npy", train)
-    np.save(out / "val_edges.npy", val)
-    np.save(out / "test_edges.npy", test)
+    np.save(out / "npy" / "train_edges.npy", train)
+    np.save(out / "npy" / "val_edges.npy", val)
+    np.save(out / "npy" / "test_edges.npy", test)
 
     meta = {
         "num_users": len(user2idx),
@@ -219,15 +244,17 @@ def build_graph_from_jsonl():
         "counts": counts,
         "item_key": cfg.item_key,
         "user_key": cfg.user_key,
+        "jsonl_path": str(jsonl_path),
+        "decode_errors": cfg.decode_errors,
     }
     with open(out / "meta.json", "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
 
-    print("\nSaved graph files to:", out)
+    print("\n✅ Saved graph files to:", out)
 
 
 # =========================
-# Build CSR user->items from edge list (fast membership checks, fast sampling)
+# CSR helpers
 # =========================
 def edges_to_user_csr(edges_2xE: np.ndarray, num_users: int):
     u = edges_2xE[0].astype(np.int64)
@@ -274,7 +301,7 @@ def sample_neg_item(indptr, indices, user: int, num_items: int, rng: np.random.G
 
 
 # =========================
-# LightGCN model
+# LightGCN
 # =========================
 class LightGCN(torch.nn.Module):
     def __init__(self, num_users, num_items, emb_dim, num_layers, norm_adj: torch.Tensor):
@@ -283,7 +310,7 @@ class LightGCN(torch.nn.Module):
         self.num_items = num_items
         self.num_nodes = num_users + num_items
         self.num_layers = num_layers
-        self.norm_adj = norm_adj  # sparse [N,N]
+        self.norm_adj = norm_adj
 
         self.emb = torch.nn.Embedding(self.num_nodes, emb_dim)
         torch.nn.init.xavier_uniform_(self.emb.weight)
@@ -314,16 +341,17 @@ class LightGCN(torch.nn.Module):
         ego_u = self.emb.weight[users]
         ego_p = self.emb.weight[self.num_users + pos_items]
         ego_n = self.emb.weight[self.num_users + neg_items]
-        reg = (ego_u.norm(2, dim=1).pow(2) + ego_p.norm(2, dim=1).pow(2) + ego_n.norm(2, dim=1).pow(2)).mean()
+        reg = (
+            ego_u.norm(2, dim=1).pow(2)
+            + ego_p.norm(2, dim=1).pow(2)
+            + ego_n.norm(2, dim=1).pow(2)
+        ).mean()
         return loss + reg_weight * reg
 
 
-# =========================
-# Build normalized adjacency from train edges
-# =========================
 def build_norm_adj(train_edges, num_users, num_items, device):
     u = train_edges[0].astype(np.int64)
-    it = train_edges[1].astype(np.int64) + num_users  # shift items
+    it = train_edges[1].astype(np.int64) + num_users
 
     row = np.concatenate([u, it])
     col = np.concatenate([it, u])
@@ -486,17 +514,20 @@ def evaluate_full_ranking(model: LightGCN, train_csr, test_csr, num_items: int, 
 # =========================
 def train_lightgcn():
     out = Path(cfg.out_dir)
-    train_edges = np.load(out / "train_edges.npy")
-    val_edges = np.load(out / "val_edges.npy")
-    test_edges = np.load(out / "test_edges.npy")
-    user2idx = load_pickle(out / "user2idx.pkl")
-    item2idx = load_pickle(out / "item2idx.pkl")
+
+    train_edges = np.load(out / "npy" / "train_edges.npy")
+    val_edges = np.load(out / "npy" / "val_edges.npy")
+    test_edges = np.load(out / "npy" / "test_edges.npy")
+    user2idx = load_pickle(out / "model" / "user2idx.pkl")
+    item2idx = load_pickle(out / "model" / "item2idx.pkl")
 
     num_users = len(user2idx)
     num_items = len(item2idx)
 
-    print(f"Loaded edges. Users={num_users:,} Items={num_items:,} "
-          f"Train={train_edges.shape[1]:,} Val={val_edges.shape[1]:,} Test={test_edges.shape[1]:,}")
+    print(
+        f"Loaded edges. Users={num_users:,} Items={num_items:,} "
+        f"Train={train_edges.shape[1]:,} Val={val_edges.shape[1]:,} Test={test_edges.shape[1]:,}"
+    )
 
     train_csr = edges_to_user_csr(train_edges, num_users)
     val_csr = edges_to_user_csr(val_edges, num_users)
@@ -518,7 +549,7 @@ def train_lightgcn():
         raise RuntimeError("No train users with interactions. Check your threshold/split.")
 
     best_val = -1.0
-    best_path = out / "best_model.pt"
+    best_path = out / "model" / "best_model.pt"
 
     for epoch in range(1, cfg.epochs + 1):
         model.train()
@@ -528,13 +559,13 @@ def train_lightgcn():
         steps = 0
 
         for start in range(0, len(train_users), cfg.batch_size):
-            batch_users = train_users[start:start + cfg.batch_size]
+            batch_users = train_users[start : start + cfg.batch_size]
 
             pos_items = []
             neg_items = []
 
             indptr, indices = train_csr
-            # Sample one (u, pos, neg) per user in batch
+
             for u in batch_users:
                 p = sample_pos_item(indptr, indices, int(u), rng)
                 if p is None:
@@ -603,9 +634,12 @@ def train_lightgcn():
 
 def main():
     set_seed(cfg.seed)
+    ensure_paths()
 
     out = Path(cfg.out_dir)
-    if not (out / "train_edges.npy").exists():
+    train_edge_path = out / "npy" / "train_edges.npy"
+
+    if not train_edge_path.exists():
         print("Graph files not found. Building graph first...")
         build_graph_from_jsonl()
     else:
