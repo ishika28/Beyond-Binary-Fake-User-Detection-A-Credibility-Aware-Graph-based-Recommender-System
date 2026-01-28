@@ -38,7 +38,7 @@ class CFG:
     num_layers: int = 3
     lr: float = 1e-3
     reg: float = 1e-4
-    epochs: int = 400
+    epochs: int = 200
     batch_size: int = 4096
 
     Ks: tuple = (10, 20)

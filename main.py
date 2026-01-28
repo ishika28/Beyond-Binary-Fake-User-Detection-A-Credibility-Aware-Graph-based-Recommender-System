@@ -18,7 +18,9 @@ Outputs (in dataset/):
 - user_features.csv
 - Clothing_Shoes_and_Jewelry_with_labels_and_features.jsonl
 - graph_pyg_parent_asin/graph_hetero_rates.pt
-- graph_pyg_parent_asin/credibility_scores.npy + credibility_scores.csv + cred_model.pt
+- graph_pyg_parent_asin/credibility_scores_minmax.npy
+- graph_pyg_parent_asin/credibility_scores_minmax_with_user_id.csv
+- graph_pyg_parent_asin/cred_model.pt
 
 Install:
   pip install numpy torch torch-geometric
@@ -89,7 +91,7 @@ PRINT_EVERY = 1_000_000
 
 # Credibility training
 DEVICE_PREF = "cuda"     # "cuda" or "cpu"
-EPOCHS = 20
+EPOCHS = 100
 BATCH_SIZE = 2048
 LR = 1e-3
 HIDDEN_DIM = 64
@@ -158,7 +160,7 @@ def step1_build_user_labels(raw_jsonl: Path, out_csv: Path):
     total_reviews = defaultdict(int)
     helpful_reviews = defaultdict(int)
 
-    with open(raw_jsonl, "r", encoding="utf-8") as f:
+    with open(raw_jsonl, "r", encoding="utf-8", errors="replace") as f:
         for i, line in enumerate(f, 1):
             r = json.loads(line)
             u = r.get("user_id")
@@ -603,7 +605,8 @@ def export_pyg(user_x, user_y, item_x, src_path: Path, dst_path: Path, attr_path
     print("[GRAPH] Saved graph:", out_pt)
     return out_pt
 
-def train_and_export_credibility(graph_pt: Path):
+# ✅✅✅ CHANGED: accepts idx2user so we can export real user_id in CSV
+def train_and_export_credibility(graph_pt: Path, idx2user):
     """
     Implements thesis version:
     - SLAS sampling: p(u|i) ∝ exp(κ * sim_{u→i}) with sim_{u→i} = avg_{i'∈I(u)} S_{ii'}  (Eq. 3.10-3.11)
@@ -616,9 +619,6 @@ def train_and_export_credibility(graph_pt: Path):
     import torch.nn as nn
     import torch.nn.functional as F
 
-    # -----------------
-    # Hyperparams (edit)
-    # -----------------
     device = "cuda" if (DEVICE_PREF == "cuda" and torch.cuda.is_available()) else "cpu"
     print(f"[CRED] device = {device}")
 
@@ -627,26 +627,21 @@ def train_and_export_credibility(graph_pt: Path):
     GAMMA = 1.0
 
     # SLAS (Eq. 3.10-3.11)
-    SLAS_KAPPA = 3.0                 # κ
-    SLAS_UPWEIGHT_LABELED = 1.0      # labeled up-weight factor (thesis says "up-weighted" but not exact value)
-    K_USER_NEIGH = 15                # |S(i)| number of users sampled for each item
-    K_ITEM_NEIGH = 15                # |S(u)| number of items sampled for each user
+    SLAS_KAPPA = 3.0
+    SLAS_UPWEIGHT_LABELED = 1.0
+    K_USER_NEIGH = 15
+    K_ITEM_NEIGH = 15
 
     # Loss weights (Eq. 3.21)
-    LAMBDA_SMOOTH = 0.1              # λ_smooth
-    LAMBDA_CONT = 0.1                # λ_cont
+    LAMBDA_SMOOTH = 0.1
+    LAMBDA_CONT = 0.1
 
     # Temporal contrastive (Eq. 3.20)
-    TAU_TEMP = 0.2                   # temperature τ
-    # Temporal view split: use timestamp_norm (<split for view1, >=split for view2)
-    TEMP_SPLIT = 0.5                 # you can randomize per step too
+    TAU_TEMP = 0.2
+    TEMP_SPLIT = 0.5
 
-    # Smoothness: use only edges with positive normalized weight
     SMOOTH_MIN_W = 0.0
 
-    # -----------------
-    # Utils
-    # -----------------
     def scatter_add(src: torch.Tensor, index: torch.Tensor, dim_size: int) -> torch.Tensor:
         out = torch.zeros((dim_size,) + src.shape[1:], device=src.device, dtype=src.dtype)
         out.index_add_(0, index, src)
@@ -656,32 +651,27 @@ def train_and_export_credibility(graph_pt: Path):
         return x / (x.norm(dim=-1, keepdim=True) + eps)
 
     def info_nce(z1: torch.Tensor, z2: torch.Tensor, tau: float) -> torch.Tensor:
-        # z1,z2: [B, d] positives are diagonal pairs
         z1 = l2_normalize(z1)
         z2 = l2_normalize(z2)
-        logits = (z1 @ z2.t()) / tau                  # [B,B]
+        logits = (z1 @ z2.t()) / tau
         labels = torch.arange(z1.size(0), device=z1.device)
         return F.cross_entropy(logits, labels)
 
-    # -----------------
-    # Model (GraphSAGE-style + EWA)
-    # -----------------
     class CredModel(nn.Module):
         def __init__(self, user_in_dim, item_in_dim, hidden_dim, edge_attr_keys):
             super().__init__()
             self.user_proj = nn.Linear(user_in_dim, hidden_dim)
             self.item_proj = nn.Linear(item_in_dim, hidden_dim)
 
-            self.item_upd = nn.Linear(hidden_dim * 2, hidden_dim)   # Eq 3.14
-            self.user_upd = nn.Linear(hidden_dim * 2, hidden_dim)   # Eq 3.16
-            self.out = nn.Linear(hidden_dim, 1)                     # Eq 3.17
+            self.item_upd = nn.Linear(hidden_dim * 2, hidden_dim)
+            self.user_upd = nn.Linear(hidden_dim * 2, hidden_dim)
+            self.out = nn.Linear(hidden_dim, 1)
 
             self.edge_attr_keys = edge_attr_keys
             self.EDGE_VERIFIED = edge_attr_keys.index("verified")
             self.EDGE_ALIGN = edge_attr_keys.index("rating_align")
 
         def ewa_raw(self, edge_attr: torch.Tensor) -> torch.Tensor:
-            # Eq. (3.12): w_{u,i} = β*Verified + γ*RatingAlign
             verified = edge_attr[:, self.EDGE_VERIFIED].clamp(0, 1)
             align = edge_attr[:, self.EDGE_ALIGN]
             w = BETA * verified + GAMMA * align
@@ -692,55 +682,39 @@ def train_and_export_credibility(graph_pt: Path):
             return w / denom[dst]
 
         def aggregate(self, src_x: torch.Tensor, edge_index: torch.Tensor, w_tilde: torch.Tensor, num_dst: int) -> torch.Tensor:
-            # edge_index: [2, E] with src=edge_index[0], dst=edge_index[1]
             src = edge_index[0]
             dst = edge_index[1]
             msg = w_tilde.unsqueeze(-1) * src_x[src]
             return scatter_add(msg, dst, dim_size=num_dst)
 
         def forward_subgraph(self, x_u, x_i, e_u2i, ea_u2i, e_i2u, ea_i2u):
-            """
-            x_u: [Uloc, Fu], x_i: [Iloc, Fi]
-            returns:
-              cred: [Uloc]
-              h_u2: [Uloc, d]  (Eq 3.16 output)
-              h_i1: [Iloc, d]  (Eq 3.14 output)
-              w1t_for_edges: [E_u2i] normalized weights (useful for smoothness)
-            """
-            h_u0 = self.user_proj(x_u)   # Eq 3.9
-            h_i0 = self.item_proj(x_i)   # Eq 3.9
+            h_u0 = self.user_proj(x_u)
+            h_i0 = self.item_proj(x_i)
 
-            # ---- Layer 1: user -> item (Eq 3.13-3.14)
             w1 = self.ewa_raw(ea_u2i)
             dst_i = e_u2i[1]
             w1t = self.normalize_per_dst(w1, dst_i, num_dst=h_i0.size(0))
             m_i1 = self.aggregate(h_u0, e_u2i, w1t, num_dst=h_i0.size(0))
             h_i1 = F.relu(self.item_upd(torch.cat([h_i0, m_i1], dim=-1)))
 
-            # ---- Layer 2: item -> user (Eq 3.15-3.16)
             w2 = self.ewa_raw(ea_i2u)
             dst_u = e_i2u[1]
             w2t = self.normalize_per_dst(w2, dst_u, num_dst=h_u0.size(0))
             m_u2 = self.aggregate(h_i1, e_i2u, w2t, num_dst=h_u0.size(0))
             h_u2 = F.relu(self.user_upd(torch.cat([h_u0, m_u2], dim=-1)))
 
-            cred = torch.sigmoid(self.out(h_u2)).squeeze(-1)  # Eq 3.17
+            cred = torch.sigmoid(self.out(h_u2)).squeeze(-1)
             return cred, h_u2, h_i1, w1t
 
-    # -----------------
-    # Load graph
-    # -----------------
     data = torch.load(graph_pt, map_location="cpu", weights_only=False)
 
-    # Global tensors
     user_x_all = data["user"].x.float()
     user_y_all = data["user"].y.long()
     item_x_all = data["item"].x.float()
 
-    e_u2i_all = data[("user", "rates", "item")].edge_index.long()      # [2, E]
-    ea_u2i_all = data[("user", "rates", "item")].edge_attr.float()     # [E, A]
+    e_u2i_all = data[("user", "rates", "item")].edge_index.long()
+    ea_u2i_all = data[("user", "rates", "item")].edge_attr.float()
 
-    # (reverse edges share same attr in your export)
     e_i2u_all = data[("item", "rev_rates", "user")].edge_index.long()
     ea_i2u_all = data[("item", "rev_rates", "user")].edge_attr.float()
 
@@ -748,35 +722,24 @@ def train_and_export_credibility(graph_pt: Path):
     I = item_x_all.size(0)
     E = e_u2i_all.size(1)
 
-    # Indices used in sampling
     ts_idx = EDGE_ATTR_KEYS.index("timestamp_norm")
 
-    # -----------------
-    # Precompute item similarity proxies for SLAS (cosine on item features)
-    # S_{ii'} is not specified in thesis; this is a reasonable default.
-    # -----------------
     item_feat = item_x_all.clone()
-    item_feat_norm = l2_normalize(item_feat)  # [I, Fi]
+    item_feat_norm = l2_normalize(item_feat)
 
-    # Compute per-user mean item feature vector (approx for avg_{i'∈I(u)} S_{ii'})
-    # user_mu[u] ~ mean of item_feat_norm over items in I(u)
-    src_u = e_u2i_all[0]  # [E]
-    dst_i = e_u2i_all[1]  # [E]
+    src_u = e_u2i_all[0]
+    dst_i = e_u2i_all[1]
     user_sum = torch.zeros((U, item_feat_norm.size(1)), dtype=torch.float32)
     user_sum.index_add_(0, src_u, item_feat_norm[dst_i])
     user_deg = torch.zeros((U,), dtype=torch.float32)
     user_deg.index_add_(0, src_u, torch.ones((E,), dtype=torch.float32))
     user_mu = user_sum / (user_deg.unsqueeze(-1).clamp(min=1.0))
-    user_mu = l2_normalize(user_mu)  # [U, Fi]
+    user_mu = l2_normalize(user_mu)
 
-    # -----------------
-    # Build adjacency lists (CSR) for fast neighbor lookup
-    # (Uses argsort; avoid Python loops over edges)
-    # -----------------
     def build_csr_from_src(src: torch.Tensor, dst: torch.Tensor, num_src: int):
         src_np = src.numpy()
         dst_np = dst.numpy()
-        order = np.argsort(src_np, kind="mergesort")  # stable, fast in C
+        order = np.argsort(src_np, kind="mergesort")
         src_sorted = src_np[order]
         dst_sorted = dst_np[order]
         counts = np.bincount(src_sorted, minlength=num_src)
@@ -786,26 +749,19 @@ def train_and_export_credibility(graph_pt: Path):
         return ptr, dst_sorted.astype(np.int64), eid_sorted
 
     print("[CRED] Building CSR adjacencies...")
-    u_ptr, u_nbr_items, u_eids = build_csr_from_src(e_u2i_all[0], e_u2i_all[1], U)  # user -> items
-    i_ptr, i_nbr_users, i_eids = build_csr_from_src(e_u2i_all[1], e_u2i_all[0], I)  # item -> users
+    u_ptr, u_nbr_items, u_eids = build_csr_from_src(e_u2i_all[0], e_u2i_all[1], U)
+    i_ptr, i_nbr_users, i_eids = build_csr_from_src(e_u2i_all[1], e_u2i_all[0], I)
     print("[CRED] CSR built.")
 
     rng = np.random.default_rng(42)
 
-    # -----------------
-    # SLAS sampling
-    # -----------------
-    def slas_sample_items_for_user(u_global: int, k: int, temporal_view: str | None):
-        """
-        Returns sampled global item ids for user u (from its neighborhood).
-        temporal_view: None | "early" | "late"
-        """
+    def slas_sample_items_for_user(u_global: int, k: int, temporal_view):
         start, end = u_ptr[u_global], u_ptr[u_global + 1]
         if end <= start:
             return np.empty((0,), dtype=np.int64)
 
-        items = u_nbr_items[start:end]        # global item ids
-        eids = u_eids[start:end]              # global edge ids
+        items = u_nbr_items[start:end]
+        eids = u_eids[start:end]
 
         if temporal_view is not None:
             ts = ea_u2i_all[eids, ts_idx].numpy()
@@ -821,9 +777,8 @@ def train_and_export_credibility(graph_pt: Path):
         if items.size <= k:
             return items.copy()
 
-        # sim_{u→i} ≈ cosine(item_i, mean_items_of_user_u)  (proxy for Eq 3.11)
-        mu_u = user_mu[u_global]  # [Fi]
-        sim = (item_feat_norm[torch.from_numpy(items)] @ mu_u).numpy()  # [deg]
+        mu_u = user_mu[u_global]
+        sim = (item_feat_norm[torch.from_numpy(items)] @ mu_u).numpy()
         w = np.exp(SLAS_KAPPA * sim)
         w = w / (w.sum() + 1e-12)
 
@@ -831,25 +786,18 @@ def train_and_export_credibility(graph_pt: Path):
         return items[choice]
 
     def slas_sample_users_for_item(i_global: int, k: int):
-        """
-        Returns sampled global user ids for item i (from its neighborhood).
-        Implements p(u|i) ∝ exp(κ * sim_{u→i}) with labeled up-weight (Eq 3.10 + text).
-        """
         start, end = i_ptr[i_global], i_ptr[i_global + 1]
         if end <= start:
             return np.empty((0,), dtype=np.int64)
 
-        users = i_nbr_users[start:end]  # global user ids
+        users = i_nbr_users[start:end]
         if users.size <= k:
             return users.copy()
 
-        # similarity proxy: cosine(item_i, user_mu[u])
-        v_i = item_feat_norm[i_global]  # [Fi]
+        v_i = item_feat_norm[i_global]
         sim = (user_mu[torch.from_numpy(users)] @ v_i).numpy()
 
         w = np.exp(SLAS_KAPPA * sim)
-
-        # labeled up-weighting (thesis: "Labeled nodes are up-weighted")
         y = user_y_all[torch.from_numpy(users)].numpy()
         labeled_mask = (y >= 0)
         w[labeled_mask] *= (1.0 + SLAS_UPWEIGHT_LABELED)
@@ -858,42 +806,26 @@ def train_and_export_credibility(graph_pt: Path):
         choice = rng.choice(users.size, size=k, replace=False, p=w)
         return users[choice]
 
-    # -----------------
-    # Subgraph builder for a seed user batch
-    # -----------------
-    def build_slas_subgraph(seed_users: np.ndarray, temporal_view: str | None):
-        """
-        Returns a sampled bipartite subgraph induced by:
-        - seed_users
-        - items sampled for each seed user (S(u))
-        - users sampled for each sampled item (S(i))
-        Local node ordering:
-        - users_local[0:bs] are the seed users (for easy supervised loss)
-        """
+    def build_slas_subgraph(seed_users: np.ndarray, temporal_view):
         bs = seed_users.size
 
-        # 1) sample items for seeds
         sampled_items_list = []
         for u in seed_users:
             sampled_items_list.append(slas_sample_items_for_user(int(u), K_ITEM_NEIGH, temporal_view))
         sampled_items = np.unique(np.concatenate(sampled_items_list) if sampled_items_list else np.empty((0,), np.int64))
 
-        # 2) sample extra users for sampled items
         extra_users_list = []
         for i_g in sampled_items:
             extra_users_list.append(slas_sample_users_for_item(int(i_g), K_USER_NEIGH))
         extra_users = np.unique(np.concatenate(extra_users_list) if extra_users_list else np.empty((0,), np.int64))
 
-        # ensure seeds are included and first
         seed_set = set(seed_users.tolist())
         extra_only = np.array([u for u in extra_users.tolist() if u not in seed_set], dtype=np.int64)
         users_global = np.concatenate([seed_users, extra_only], axis=0)
 
-        # local id maps
         user_gid2lid = {int(g): idx for idx, g in enumerate(users_global.tolist())}
         item_gid2lid = {int(g): idx for idx, g in enumerate(sampled_items.tolist())}
 
-        # 3) collect edges u->i that stay inside sampled items
         src_l = []
         dst_l = []
         eid_l = []
@@ -924,18 +856,15 @@ def train_and_export_credibility(graph_pt: Path):
                     eid_l.append(eid)
 
         if len(eid_l) == 0:
-            # empty subgraph safeguard
             e_u2i = torch.zeros((2, 0), dtype=torch.long)
             ea_u2i = torch.zeros((0, ea_u2i_all.size(1)), dtype=torch.float32)
         else:
             e_u2i = torch.tensor([src_l, dst_l], dtype=torch.long)
             ea_u2i = ea_u2i_all[torch.tensor(eid_l, dtype=torch.long)].clone()
 
-        # reverse edges i->u are just swapped with same attrs
         e_i2u = torch.stack([e_u2i[1], e_u2i[0]], dim=0)
         ea_i2u = ea_u2i
 
-        # node features/labels
         x_u = user_x_all[torch.from_numpy(users_global)].clone()
         y_u = user_y_all[torch.from_numpy(users_global)].clone()
         x_i = item_x_all[torch.from_numpy(sampled_items)].clone()
@@ -953,9 +882,6 @@ def train_and_export_credibility(graph_pt: Path):
             "ea_i2u": ea_i2u,
         }
 
-    # -----------------
-    # Train/test split on labeled users
-    # -----------------
     labeled_users = (user_y_all >= 0).nonzero(as_tuple=False).view(-1).numpy()
     if labeled_users.size == 0:
         raise RuntimeError("No labeled users found (y>=0). Check Ru labeling output.")
@@ -965,17 +891,10 @@ def train_and_export_credibility(graph_pt: Path):
     train_users = labeled_users[:split]
     print(f"[CRED] labeled users={labeled_users.size:,} | train={train_users.size:,}")
 
-    # -----------------
-    # Train
-    # -----------------
     model = CredModel(user_x_all.size(1), item_x_all.size(1), HIDDEN_DIM, EDGE_ATTR_KEYS).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=LR)
 
     def smoothness_loss(h_u2: torch.Tensor, h_i1: torch.Tensor, e_u2i: torch.Tensor, w_u2i_norm: torch.Tensor):
-        """
-        Thesis Eq (3.19): encourages connected nodes to be close, weighted by w~.
-        In bipartite setting, we apply it on (u,i) edges in the sampled subgraph.
-        """
         if e_u2i.size(1) == 0:
             return torch.tensor(0.0, device=h_u2.device)
         src = e_u2i[0]
@@ -987,7 +906,6 @@ def train_and_export_credibility(graph_pt: Path):
         diff = h_u2[src[mask]] - h_i1[dst[mask]]
         return (w[mask] * (diff.pow(2).sum(dim=-1))).mean()
 
-    # minibatch iterator
     def batches(arr, bs):
         for j in range(0, len(arr), bs):
             yield arr[j:j + bs]
@@ -1001,11 +919,9 @@ def train_and_export_credibility(graph_pt: Path):
         for seed in batches(train_users, BATCH_SIZE):
             seed = np.asarray(seed, dtype=np.int64)
 
-            # Two temporal perspectives for contrastive loss (Eq 3.20)
             g1 = build_slas_subgraph(seed, temporal_view="early")
             g2 = build_slas_subgraph(seed, temporal_view="late")
 
-            # Move to device
             for g in (g1, g2):
                 g["x_u"] = g["x_u"].to(device)
                 g["y_u"] = g["y_u"].to(device)
@@ -1026,7 +942,6 @@ def train_and_export_credibility(graph_pt: Path):
 
             bs = g1["bs"]
 
-            # ---- Supervised BCE (Eq 3.18)
             y = g1["y_u"][:bs]
             keep = y >= 0
             loss_sup = (
@@ -1035,13 +950,9 @@ def train_and_export_credibility(graph_pt: Path):
                 else torch.tensor(0.0, device=device)
             )
 
-            # ---- Smoothness (Eq 3.19) on view1 subgraph
             loss_smooth = smoothness_loss(h_u2_1, h_i1_1, g1["e_u2i"], w1t_1)
-
-            # ---- Temporal contrastive (Eq 3.20): positives are same user across time views
             loss_cont = info_nce(h_u2_1[:bs], h_u2_2[:bs], tau=TAU_TEMP)
 
-            # ---- Final objective (Eq 3.21)
             loss = loss_sup + LAMBDA_SMOOTH * loss_smooth + LAMBDA_CONT * loss_cont
             loss.backward()
             opt.step()
@@ -1051,9 +962,6 @@ def train_and_export_credibility(graph_pt: Path):
 
         print(f"[CRED] Epoch {ep:02d} | loss={total_loss/max(nsteps,1):.4f}")
 
-    # -----------------
-    # Inference: credibility for all users (single view)
-    # -----------------
     model.eval()
     cred_all = torch.empty((U,), dtype=torch.float32)
 
@@ -1063,33 +971,91 @@ def train_and_export_credibility(graph_pt: Path):
             seed = np.asarray(seed, dtype=np.int64)
             g = build_slas_subgraph(seed, temporal_view=None)
 
-            # move
-            x_u = g["x_u"].to(device)
-            x_i = g["x_i"].to(device)
+            x_u   = g["x_u"].to(device)
+            x_i   = g["x_i"].to(device)
             e_u2i = g["e_u2i"].to(device)
-            ea_u2i = g["ea_u2i"].to(device)
+            ea_u2i= g["ea_u2i"].to(device)
             e_i2u = g["e_i2u"].to(device)
-            ea_i2u = g["ea_i2u"].to(device)
+            ea_i2u= g["ea_i2u"].to(device)
 
             pred, _, _, _ = model.forward_subgraph(x_u, x_i, e_u2i, ea_u2i, e_i2u, ea_i2u)
+
             bs = g["bs"]
             cred_all[torch.from_numpy(seed)] = pred[:bs].detach().cpu()
+
+    cred_np = cred_all.numpy()
+    cmin = float(cred_np.min())
+    cmax = float(cred_np.max())
+
+    if (cmax - cmin) < 1e-12:
+        cred_norm = np.zeros_like(cred_np, dtype=np.float32)
+    else:
+        cred_norm = ((cred_np - cmin) / (cmax - cmin)).astype(np.float32)
+
+    cred_all = torch.from_numpy(cred_norm)
+
+    print(f"[CRED] Raw cred_all: min={cmin:.6g}, max={cmax:.6g}")
+    print(f"[CRED] MinMax cred_all: min={cred_norm.min():.6f}, max={cred_norm.max():.6f}")
+
+    p10, p50, p90, p99 = np.percentile(cred_norm, [10, 50, 90, 99])
+    print(f"[CRED] Percentiles: p10={p10:.4f}, p50={p50:.4f}, p90={p90:.4f}, p99={p99:.4f}")
 
     # -----------------
     # Save outputs
     # -----------------
-    out_npy = OUT_DIR/ "/credibility_scores.npy"
-    out_csv = OUT_DIR / "/credibility_scores.csv"
-    out_pt = OUT_DIR / "/cred_model.pt"
+    out_npy = OUT_DIR / "credibility_scores_minmax.npy"
+    out_csv = OUT_DIR / "credibility_scores_minmax_with_user_id.csv"
+    out_pt  = OUT_DIR / "cred_model.pt"
 
     np.save(out_npy, cred_all.numpy())
-    with open(out_csv, "w", encoding="utf-8") as f:
-        f.write("user_idx,credibility\n")
-        for i, v in enumerate(cred_all.numpy()):
-            f.write(f"{i},{float(v):.6f}\n")
+
+    # ✅✅✅ CHANGED: write real user_id + idx + score
+    cred_arr = cred_all.numpy()
+    with open(out_csv, "w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["user_id", "user_idx", "credibility"])
+        for idx, score in enumerate(cred_arr):
+            uid = idx2user[idx] if idx < len(idx2user) else None
+            w.writerow([uid, idx, f"{float(score):.6f}"])
 
     torch.save(model.state_dict(), out_pt)
 
     print(f"[CRED] Saved: {out_npy}")
     print(f"[CRED] Saved: {out_csv}")
     print(f"[CRED] Saved: {out_pt}")
+
+def main():
+    print("[START] Pipeline running...")
+
+    ensure_outdir()
+
+    # Step 1
+    step1_build_user_labels(RAW_JSONL, LABELS_CSV)
+
+    # Step 2
+    step2_merge_labels(RAW_JSONL, LABELS_CSV, LABELED_JSONL)
+
+    # Step 3
+    step3_compute_user_features(LABELED_JSONL, FEATURES_CSV)
+
+    # Step 4
+    step4_merge_features(FEATURES_CSV, LABELED_JSONL, LABELED_FEATURED_JSONL)
+
+    # Step 5
+    user2idx, item2idx, user_x, user_y, item_mean, item_x, stats = pass1_build_maps_and_stats(LABELED_FEATURED_JSONL)
+    src_path, dst_path, attr_path = pass2_write_edges(LABELED_FEATURED_JSONL, user2idx, item2idx, item_mean, stats)
+    save_mappings(user2idx, item2idx)
+    graph_pt = export_pyg(user_x, user_y, item_x, src_path, dst_path, attr_path, stats)
+
+    # ✅✅✅ NEW: build idx2user list (idx -> real user_id)
+    idx2user = [None] * len(user2idx)
+    for uid, idx in user2idx.items():
+        idx2user[idx] = uid
+
+    # Step 6
+    train_and_export_credibility(graph_pt, idx2user)
+
+    print("[DONE] Pipeline finished successfully.")
+
+if __name__ == "__main__":
+    main()
