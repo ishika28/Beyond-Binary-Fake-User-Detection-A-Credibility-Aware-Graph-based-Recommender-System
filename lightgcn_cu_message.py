@@ -1,14 +1,6 @@
-# lightgcn_full_pipeline_cred_all_eq_3_22_to_3_28.py
-# Raw JSONL -> split -> train credibility-weighted LightGCN -> eval.
-#
-# Implements Thesis Eq (3.22)–(3.28):
-# (3.22) init embeddings
-# (3.23) user->item message passing weighted by credibility c_hat[u]
-# (3.24) item->user message passing standard
-# (3.25) average embeddings across layers
-# (3.26) prediction y_hat = e_u^T e_i
-# (3.27) L_fair = sum pop(i) * y_hat(u,i)
-# (3.28) L = lambda_fair * L_fair + lambda_reg * L_reg   (we add BPR for ranking learning)
+# raw_lightgcn_with_cred_message_passing.py
+# Your raw LightGCN pipeline + credibility used INSIDE message passing (Eq 3.23/3.24 style).
+# Nothing else added (no fairness term, no extra losses).
 
 import csv
 import json
@@ -30,13 +22,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 @dataclass
 class CFG:
     jsonl_path: str = str((SCRIPT_DIR / "dataset" / "Clothing_Shoes_and_Jewelry.jsonl").resolve())
-    out_dir: str = str((SCRIPT_DIR / "dataset" / "lightgcn_cu_pipeline_parent").resolve())
-
-    # credibility CSV
-    # supports:
-    #   - user_id,credibility
-    #   - user_idx,credibility
-    cred_csv_path: str = str((SCRIPT_DIR / "dataset" / "graph_pyg_parent_asin" / "credibility_scores_minmax_with_user_id.csv").resolve())
+    out_dir: str = str((SCRIPT_DIR / "dataset" / "lightgcn_pipeline_cu_message_parent").resolve())
 
     user_key: str = "user_id"
     item_key: str = "parent_asin"
@@ -53,25 +39,24 @@ class CFG:
     emb_dim: int = 64
     num_layers: int = 3
     lr: float = 1e-3
-
-    # Eq (3.28): lambda_reg * Lreg
-    lambda_reg: float = 1e-4
-
-    # Eq (3.28): lambda_fair * Lfair
-    lambda_fair: float = 0.0  # set e.g. 1e-2 to enable Eq (3.27)
-
+    reg: float = 1e-4
     epochs: int = 400
     batch_size: int = 4096
 
     Ks: tuple = (10, 20)
     eval_every: int = 1
 
-    eval_mode: str = "sampled"      # "sampled" or "full"
+    eval_mode: str = "sampled"   # "sampled" or "full"
     sampled_negatives: int = 99
 
     print_every: int = 1_000_000
-
     decode_errors: str = "replace"
+
+    # ✅ credibility CSV path (minmax)
+    # Supports:
+    #   - user_id,credibility
+    #   - user_idx,credibility  (ONLY if user_idx matches LightGCN user2idx!)
+    cred_csv_path: str = str((SCRIPT_DIR / "dataset" / "graph_pyg_parent_asin" / "credibility_scores_minmax.csv").resolve())
 
 
 cfg = CFG()
@@ -141,6 +126,7 @@ def ensure_paths():
 def iter_jsonl_records(path: Path):
     bad_json = 0
     total = 0
+
     with open(path, "rb") as f:
         for raw in f:
             total += 1
@@ -160,7 +146,72 @@ def iter_jsonl_records(path: Path):
 
 
 # =========================
-# STEP 1: GRAPH CONSTRUCTION
+# CREDIBILITY LOADER
+# =========================
+def load_credibility_vector(cred_csv_path: str, user2idx: dict) -> np.ndarray:
+    """
+    Returns cred[num_users] float32 in [0,1].
+    Missing users -> 1.0 (no change).
+    Supports CSV headers:
+      (A) user_id,credibility
+      (B) user_idx,credibility
+    """
+    num_users = len(user2idx)
+    cred = np.ones((num_users,), dtype=np.float32)
+
+    p = Path(cred_csv_path)
+    if not p.exists():
+        print(f"[CRED] Cred CSV not found: {p} -> using all ones.")
+        return cred
+
+    with open(p, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        headers = reader.fieldnames or []
+        cols = set(headers)
+
+        used, skipped = 0, 0
+
+        if "user_id" in cols and "credibility" in cols:
+            for row in reader:
+                uid = row.get("user_id")
+                if not uid:
+                    continue
+                uidx = user2idx.get(uid)
+                if uidx is None:
+                    skipped += 1
+                    continue
+                try:
+                    cred[uidx] = float(row["credibility"])
+                    used += 1
+                except Exception:
+                    continue
+            print(f"[CRED] Loaded by user_id. used={used:,} skipped_not_in_lightgcn={skipped:,}")
+
+        elif "user_idx" in cols and "credibility" in cols:
+            for row in reader:
+                try:
+                    u = int(row["user_idx"])
+                    if 0 <= u < num_users:
+                        cred[u] = float(row["credibility"])
+                        used += 1
+                except Exception:
+                    continue
+            print(f"[CRED] Loaded by user_idx. used={used:,}")
+
+        else:
+            raise ValueError(
+                f"[CRED] Unsupported cred CSV header: {headers}. "
+                f"Expected (user_id,credibility) OR (user_idx,credibility)."
+            )
+
+    cred = np.clip(cred, 0.0, 1.0).astype(np.float32)
+    p10, p50, p90, p99 = np.percentile(cred, [10, 50, 90, 99])
+    print(f"[CRED] stats: min={cred.min():.4f} p10={p10:.4f} p50={p50:.4f} p90={p90:.4f} p99={p99:.4f} max={cred.max():.4f}")
+    return cred
+
+
+# =========================
+# STEP 1: GRAPH CONSTRUCTION (unchanged)
 # =========================
 def build_graph_from_jsonl():
     ensure_paths()
@@ -196,7 +247,7 @@ def build_graph_from_jsonl():
 
         if i % cfg.print_every == 0:
             print(
-                f"PASS1 {i:,} | users={len(user2idx):,} items={len(item2idx):,} "
+                f"PASS1 {i:,} lines | users={len(user2idx):,} items={len(item2idx):,} "
                 f"pos_edges={pos_edges:,} train={counts['train']:,} val={counts['val']:,} test={counts['test']:,}"
             )
 
@@ -236,16 +287,6 @@ def build_graph_from_jsonl():
 
         ptr[b] += 1
 
-        if i % cfg.print_every == 0:
-            print(
-                f"PASS2 {i:,} | train={ptr['train']:,}/{counts['train']:,} "
-                f"val={ptr['val']:,}/{counts['val']:,} test={ptr['test']:,}/{counts['test']:,}"
-            )
-
-    assert ptr["train"] == counts["train"]
-    assert ptr["val"] == counts["val"]
-    assert ptr["test"] == counts["test"]
-
     np.save(out / "npy" / "train_edges.npy", train)
     np.save(out / "npy" / "val_edges.npy", val)
     np.save(out / "npy" / "test_edges.npy", test)
@@ -254,7 +295,7 @@ def build_graph_from_jsonl():
 
 
 # =========================
-# CSR helpers
+# CSR helpers (unchanged)
 # =========================
 def edges_to_user_csr(edges_2xE: np.ndarray, num_users: int):
     u = edges_2xE[0].astype(np.int64)
@@ -273,6 +314,7 @@ def edges_to_user_csr(edges_2xE: np.ndarray, num_users: int):
         start, end = indptr[user], indptr[user + 1]
         if end - start > 1:
             indices[start:end] = np.sort(indices[start:end])
+
     return indptr, indices
 
 
@@ -300,171 +342,114 @@ def sample_neg_item(indptr, indices, user: int, num_items: int, rng: np.random.G
 
 
 # =========================
-# Credibility loader
+# Build credibility-weighted propagation matrices (Eq 3.23 / 3.24 behavior)
 # =========================
-def load_credibility_vector(num_users: int, user2idx: dict) -> np.ndarray:
+def build_message_passing_mats(train_edges_2xE: np.ndarray, num_users: int, num_items: int, cred_u: torch.Tensor, device: str):
     """
-    Returns cred[num_users] float32 (clamped 0..1)
-    Missing users -> default 1.0
-    CSV formats:
-      (A) user_id,credibility
-      (B) user_idx,credibility
+    Builds two sparse mats:
+      M_ui: [U, I]  user <- item  (standard normalized)
+      M_iu: [I, U]  item <- user  (credibility-weighted on users)
+
+    Normalization uses 1/sqrt(deg_u * deg_i).
+    For M_iu (user->item messages) multiply by c_u.
     """
-    cred = np.ones((num_users,), dtype=np.float32)
-    p = Path(cfg.cred_csv_path)
-
-    if not p.exists():
-        print(f"[CRED] Cred CSV not found: {p}. Using all-ones credibility.")
-        return cred
-
-    with open(p, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        cols = [c.strip() for c in (reader.fieldnames or [])]
-        cols_set = set(cols)
-
-        used, skipped = 0, 0
-
-        if "user_id" in cols_set and "credibility" in cols_set:
-            for row in reader:
-                uid = row.get("user_id")
-                if not uid:
-                    continue
-                if uid not in user2idx:
-                    skipped += 1
-                    continue
-                try:
-                    cred[user2idx[uid]] = float(row["credibility"])
-                    used += 1
-                except Exception:
-                    continue
-            print(f"[CRED] Loaded by user_id. used={used:,} skipped_not_in_lightgcn={skipped:,}")
-
-        elif "user_idx" in cols_set and "credibility" in cols_set:
-            for row in reader:
-                try:
-                    u = int(row["user_idx"])
-                    if 0 <= u < num_users:
-                        cred[u] = float(row["credibility"])
-                        used += 1
-                except Exception:
-                    continue
-            print(f"[CRED] Loaded by user_idx. used={used:,}")
-
-        else:
-            raise ValueError(
-                f"[CRED] Unsupported cred CSV header: {cols}. "
-                f"Expected (user_id,credibility) OR (user_idx,credibility)."
-            )
-
-    cred = np.clip(cred, 0.0, 1.0).astype(np.float32)
-    p10, p50, p90 = np.percentile(cred, [10, 50, 90])
-    print(f"[CRED] stats: min={cred.min():.4f} p10={p10:.4f} p50={p50:.4f} p90={p90:.4f} max={cred.max():.4f}")
-    return cred
-
-
-# =========================
-# Eq (3.23) & (3.24) sparse operators
-# =========================
-def build_cred_weighted_mats(train_edges, num_users, num_items, cred_u: np.ndarray, device: str):
-    """
-    Implements Eq (3.23) and Eq (3.24).
-
-    Let deg_u = |N(u)|, deg_i = |N(i)|
-
-    Eq (3.23): e_i^{k+1} = sum_{u in N(i)} (c_hat[u] / sqrt(deg_u * deg_i)) * e_u^k
-      => M_ui[row=item, col=user] = c_hat[u] / sqrt(deg_u*deg_i)
-
-    Eq (3.24): e_u^{k+1} = sum_{i in N(u)} (1 / sqrt(deg_u * deg_i)) * e_i^k
-      => M_iu[row=user, col=item] = 1 / sqrt(deg_u*deg_i)
-    """
-    u = train_edges[0].astype(np.int64)
-    i = train_edges[1].astype(np.int64)
+    u = train_edges_2xE[0].astype(np.int64)  # [E]
+    i = train_edges_2xE[1].astype(np.int64)  # [E]
+    E = u.shape[0]
 
     deg_u = np.bincount(u, minlength=num_users).astype(np.float32)
     deg_i = np.bincount(i, minlength=num_items).astype(np.float32)
 
-    denom = np.sqrt(np.maximum(deg_u[u] * deg_i[i], 1e-12)).astype(np.float32)
+    inv_sqrt_u = 1.0 / np.sqrt(np.maximum(deg_u, 1.0))
+    inv_sqrt_i = 1.0 / np.sqrt(np.maximum(deg_i, 1.0))
 
-    w_ui = (cred_u[u] / denom).astype(np.float32)   # Eq (3.23)
-    w_iu = (1.0 / denom).astype(np.float32)         # Eq (3.24)
+    # base norm weights per edge: 1/sqrt(deg_u * deg_i)
+    w_base = inv_sqrt_u[u] * inv_sqrt_i[i]  # [E] numpy
 
-    idx_ui = torch.tensor(np.vstack([i, u]), dtype=torch.long, device=device)
-    val_ui = torch.tensor(w_ui, dtype=torch.float32, device=device)
-    M_ui = torch.sparse_coo_tensor(idx_ui, val_ui, size=(num_items, num_users)).coalesce()
+    # M_ui: user receives from items (no credibility here)
+    # indices: rows=u, cols=i, values=w_base
+    idx_ui = torch.tensor(np.vstack([u, i]), dtype=torch.long, device=device)
+    val_ui = torch.tensor(w_base, dtype=torch.float32, device=device)
+    M_ui = torch.sparse_coo_tensor(idx_ui, val_ui, size=(num_users, num_items)).coalesce()
 
-    idx_iu = torch.tensor(np.vstack([u, i]), dtype=torch.long, device=device)
-    val_iu = torch.tensor(w_iu, dtype=torch.float32, device=device)
-    M_iu = torch.sparse_coo_tensor(idx_iu, val_iu, size=(num_users, num_items)).coalesce()
+    # M_iu: item receives from users (multiply by c_u on each edge)
+    # w_cred = c_u * w_base
+    # cred_u is torch [U] or [U,1]
+    c_u_np = cred_u.detach().view(-1).cpu().numpy().astype(np.float32)
+    w_cred = c_u_np[u] * w_base
 
-    return M_ui, M_iu, deg_i
+    idx_iu = torch.tensor(np.vstack([i, u]), dtype=torch.long, device=device)  # rows=item, cols=user
+    val_iu = torch.tensor(w_cred, dtype=torch.float32, device=device)
+    M_iu = torch.sparse_coo_tensor(idx_iu, val_iu, size=(num_items, num_users)).coalesce()
+
+    return M_ui, M_iu
 
 
 # =========================
-# Credibility-Weighted LightGCN
+# LightGCN with alternating bipartite propagation (Eq 3.23/3.24 style)
 # =========================
-class CredLightGCN(torch.nn.Module):
+class LightGCN(torch.nn.Module):
     def __init__(self, num_users, num_items, emb_dim, num_layers, M_ui: torch.Tensor, M_iu: torch.Tensor):
         super().__init__()
         self.num_users = num_users
         self.num_items = num_items
         self.num_layers = num_layers
-        self.M_ui = M_ui.coalesce()
-        self.M_iu = M_iu.coalesce()
 
-        # Eq (3.22): init embeddings e_u^(0), e_i^(0) in R^d
+        # sparse mats
+        self.M_ui = M_ui  # [U, I]
+        self.M_iu = M_iu  # [I, U]
+
+        # separate user/item embeddings (cleaner for alternating propagation)
         self.user_emb = torch.nn.Embedding(num_users, emb_dim)
         self.item_emb = torch.nn.Embedding(num_items, emb_dim)
         torch.nn.init.xavier_uniform_(self.user_emb.weight)
         torch.nn.init.xavier_uniform_(self.item_emb.weight)
 
-    def propagate_all_layers(self):
-        """
-        Returns lists [e_u^(0)..e_u^(K)] and [e_i^(0)..e_i^(K)]
-        """
-        e_u = self.user_emb.weight
-        e_i = self.item_emb.weight
-        us = [e_u]
-        is_ = [e_i]
+    def propagate(self):
+        u0 = self.user_emb.weight
+        i0 = self.item_emb.weight
+
+        u_list = [u0]
+        i_list = [i0]
+
+        u = u0
+        i = i0
 
         for _ in range(self.num_layers):
-            # Eq (3.23): item <- user (cred-weighted)
-            e_i = torch.sparse.mm(self.M_ui, e_u)
+            # Eq-like:
+            # item <- user (credibility inside M_iu)
+            i = torch.sparse.mm(self.M_iu, u)   # [I,D]
+            # user <- item (standard)
+            u = torch.sparse.mm(self.M_ui, i)   # [U,D]
 
-            # Eq (3.24): user <- item (standard)
-            e_u = torch.sparse.mm(self.M_iu, is_[-1])
+            u_list.append(u)
+            i_list.append(i)
 
-            us.append(e_u)
-            is_.append(e_i)
+        u_final = torch.stack(u_list, dim=0).mean(dim=0)
+        i_final = torch.stack(i_list, dim=0).mean(dim=0)
+        return u_final, i_final
 
-        return us, is_
+    def get_user_item_emb(self):
+        return self.propagate()
 
-    def final_embeddings(self):
-        """
-        Eq (3.25): average embeddings across layers (0..K)
-        """
-        us, is_ = self.propagate_all_layers()
-        e_u = torch.stack(us, dim=0).mean(dim=0)
-        e_i = torch.stack(is_, dim=0).mean(dim=0)
-        return e_u, e_i
+    def bpr_loss(self, users, pos_items, neg_items, user_emb, item_emb, reg_weight: float):
+        u = user_emb[users]
+        p = item_emb[pos_items]
+        n = item_emb[neg_items]
+        pos_scores = (u * p).sum(dim=1)
+        neg_scores = (u * n).sum(dim=1)
+        loss = -torch.log(torch.sigmoid(pos_scores - neg_scores) + 1e-12).mean()
 
-    def score(self, users: torch.Tensor, items: torch.Tensor, e_u: torch.Tensor, e_i: torch.Tensor):
-        """
-        Eq (3.26): y_hat(u,i) = e_u^T e_i
-        """
-        return (e_u[users] * e_i[items]).sum(dim=1)
-
-    def l2_reg(self, users, pos_items, neg_items):
-        """
-        L_reg: standard L2 regularization on embeddings (batch ego)
-        """
-        eu = self.user_emb.weight[users]
-        ep = self.item_emb.weight[pos_items]
-        en = self.item_emb.weight[neg_items]
-        return (eu.norm(2, dim=1).pow(2) + ep.norm(2, dim=1).pow(2) + en.norm(2, dim=1).pow(2)).mean()
+        reg = (
+            self.user_emb.weight[users].norm(2, dim=1).pow(2)
+            + self.item_emb.weight[pos_items].norm(2, dim=1).pow(2)
+            + self.item_emb.weight[neg_items].norm(2, dim=1).pow(2)
+        ).mean()
+        return loss + reg_weight * reg
 
 
 # =========================
-# Evaluation
+# Evaluation (unchanged)
 # =========================
 def metrics_at_k(ranked_items, gt_set, K):
     topk = ranked_items[:K]
@@ -481,23 +466,24 @@ def metrics_at_k(ranked_items, gt_set, K):
     ideal_hits = min(len(gt_set), K)
     idcg = sum(1.0 / math.log2(i + 2) for i in range(ideal_hits))
     ndcg = (dcg / idcg) if idcg > 0 else 0.0
+
     return precision, recall, ndcg
 
 
 @torch.no_grad()
-def evaluate_sampled(model: CredLightGCN, train_csr, test_csr, num_items: int, device: str):
+def evaluate_sampled(model: LightGCN, train_csr, test_csr, num_items: int, device: str):
     indptr_tr, indices_tr = train_csr
     indptr_te, indices_te = test_csr
 
-    e_u, e_i = model.final_embeddings()
-    e_u = e_u.to(device)
-    e_i = e_i.to(device)
+    user_emb, item_emb = model.get_user_item_emb()
+    user_emb = user_emb.to(device)
+    item_emb = item_emb.to(device)
 
     rng = np.random.default_rng(cfg.seed + 999)
 
     users = np.where((indptr_te[1:] - indptr_te[:-1]) > 0)[0]
     if len(users) == 0:
-        raise RuntimeError("No users with test interactions.")
+        raise RuntimeError("No users with test interactions. Check your split or threshold.")
 
     sums = {K: {"p": 0.0, "r": 0.0, "n": 0.0} for K in cfg.Ks}
     n_users = 0
@@ -520,8 +506,8 @@ def evaluate_sampled(model: CredLightGCN, train_csr, test_csr, num_items: int, d
 
         cand = np.array([pos] + negs, dtype=np.int64)
 
-        uvec = e_u[int(u)].unsqueeze(0)
-        ivec = e_i[cand]
+        uvec = user_emb[int(u)].unsqueeze(0)
+        ivec = item_emb[cand]
         scores = (uvec * ivec).sum(dim=1).detach().cpu().numpy()
 
         ranked = cand[np.argsort(-scores)]
@@ -546,8 +532,61 @@ def evaluate_sampled(model: CredLightGCN, train_csr, test_csr, num_items: int, d
     return results
 
 
+@torch.no_grad()
+def evaluate_full_ranking(model: LightGCN, train_csr, test_csr, num_items: int, device: str):
+    indptr_tr, indices_tr = train_csr
+    indptr_te, indices_te = test_csr
+
+    user_emb, item_emb = model.get_user_item_emb()
+    user_emb = user_emb.to(device)
+    item_emb = item_emb.to(device)
+
+    users = np.where((indptr_te[1:] - indptr_te[:-1]) > 0)[0]
+    if len(users) == 0:
+        raise RuntimeError("No users with test interactions. Check your split or threshold.")
+
+    sums = {K: {"p": 0.0, "r": 0.0, "n": 0.0} for K in cfg.Ks}
+    n_users = 0
+
+    all_items = torch.arange(num_items, device=device)
+
+    for u in users:
+        start, end = indptr_te[u], indptr_te[u + 1]
+        gt = indices_te[start:end]
+        gt_set = set(map(int, gt.tolist()))
+
+        uvec = user_emb[int(u)].unsqueeze(0)
+        scores = (uvec * item_emb).sum(dim=1)
+
+        tr_s, tr_e = indptr_tr[u], indptr_tr[u + 1]
+        train_items = indices_tr[tr_s:tr_e]
+        if len(train_items) > 0:
+            scores[torch.tensor(train_items, device=device, dtype=torch.long)] = -1e9
+
+        ranked = all_items[torch.argsort(scores, descending=True)].detach().cpu().numpy()
+
+        for K in cfg.Ks:
+            p, r, n = metrics_at_k(ranked, gt_set, K)
+            sums[K]["p"] += p
+            sums[K]["r"] += r
+            sums[K]["n"] += n
+
+        n_users += 1
+
+    results = {}
+    for K in cfg.Ks:
+        results[K] = {
+            "precision": sums[K]["p"] / n_users,
+            "recall": sums[K]["r"] / n_users,
+            "ndcg": sums[K]["n"] / n_users,
+            "users_eval": n_users,
+            "mode": "full",
+        }
+    return results
+
+
 # =========================
-# TRAIN LOOP (Eq 3.27 + 3.28 included)
+# TRAIN LOOP
 # =========================
 def train_lightgcn():
     out = Path(cfg.out_dir)
@@ -566,9 +605,6 @@ def train_lightgcn():
         f"Train={train_edges.shape[1]:,} Val={val_edges.shape[1]:,} Test={test_edges.shape[1]:,}"
     )
 
-    # credibility (only apply to users that exist in this LightGCN mapping)
-    cred_u = load_credibility_vector(num_users, user2idx)
-
     train_csr = edges_to_user_csr(train_edges, num_users)
     val_csr = edges_to_user_csr(val_edges, num_users)
     test_csr = edges_to_user_csr(test_edges, num_users)
@@ -576,14 +612,14 @@ def train_lightgcn():
     device = cfg.device
     print("Using device:", device)
 
-    # Eq (3.23)/(3.24)
-    M_ui, M_iu, deg_i = build_cred_weighted_mats(train_edges, num_users, num_items, cred_u, device=device)
+    # Load credibility (vector for LightGCN users only)
+    cred_np = load_credibility_vector(cfg.cred_csv_path, user2idx)
+    cred_t = torch.tensor(cred_np, dtype=torch.float32, device=device)
 
-    # Eq (3.27): pop(i) normalized popularity based on TRAIN interactions
-    pop = (deg_i / max(float(deg_i.max()), 1.0)).astype(np.float32)
-    pop_t = torch.tensor(pop, device=device, dtype=torch.float32)
+    # Build message-passing mats (credibility inside user->item)
+    M_ui, M_iu = build_message_passing_mats(train_edges, num_users, num_items, cred_t, device=device)
 
-    model = CredLightGCN(num_users, num_items, cfg.emb_dim, cfg.num_layers, M_ui, M_iu).to(device)
+    model = LightGCN(num_users, num_items, cfg.emb_dim, cfg.num_layers, M_ui, M_iu).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=cfg.lr)
 
     rng = np.random.default_rng(cfg.seed)
@@ -591,12 +627,10 @@ def train_lightgcn():
     indptr_tr, _ = train_csr
     train_users = np.where((indptr_tr[1:] - indptr_tr[:-1]) > 0)[0]
     if len(train_users) == 0:
-        raise RuntimeError("No train users with interactions.")
+        raise RuntimeError("No train users with interactions. Check your threshold/split.")
 
     best_val = -1.0
-    best_path = out / "model" / "best_model_cred.pt"
-
-    indptr, indices = train_csr
+    best_path = out / "model" / "best_model.pt"
 
     for epoch in range(1, cfg.epochs + 1):
         model.train()
@@ -608,16 +642,18 @@ def train_lightgcn():
         for start in range(0, len(train_users), cfg.batch_size):
             batch_users = train_users[start : start + cfg.batch_size]
 
-            used_users = []
             pos_items = []
             neg_items = []
+            used_users = []
+
+            indptr, indices = train_csr
 
             for u in batch_users:
                 p = sample_pos_item(indptr, indices, int(u), rng)
                 if p is None:
                     continue
                 n = sample_neg_item(indptr, indices, int(u), num_items, rng)
-                used_users.append(u)
+                used_users.append(int(u))
                 pos_items.append(p)
                 neg_items.append(n)
 
@@ -628,24 +664,8 @@ def train_lightgcn():
             pos_t = torch.tensor(pos_items, device=device, dtype=torch.long)
             neg_t = torch.tensor(neg_items, device=device, dtype=torch.long)
 
-            # Eq (3.25): compute final embeddings
-            e_u, e_i = model.final_embeddings()
-
-            # --- BPR main ranking objective (needed to learn recommendations)
-            pos_scores = model.score(users_t, pos_t, e_u, e_i)  # Eq (3.26)
-            neg_scores = model.score(users_t, neg_t, e_u, e_i)  # Eq (3.26)
-            loss_bpr = -torch.log(torch.sigmoid(pos_scores - neg_scores) + 1e-12).mean()
-
-            # Eq (3.27): L_fair = sum pop(i) * y_hat(u,i)
-            # minibatch approximation over observed positives
-            loss_fair = (pop_t[pos_t] * pos_scores).mean()
-
-            # L_reg: L2 regularization
-            loss_reg = model.l2_reg(users_t, pos_t, neg_t)
-
-            # Eq (3.28): L = lambda_fair*L_fair + lambda_reg*L_reg
-            # plus BPR for training signal
-            loss = loss_bpr + cfg.lambda_fair * loss_fair + cfg.lambda_reg * loss_reg
+            user_emb, item_emb = model.get_user_item_emb()
+            loss = model.bpr_loss(users_t, pos_t, neg_t, user_emb, item_emb, cfg.reg)
 
             opt.zero_grad()
             loss.backward()
@@ -655,11 +675,15 @@ def train_lightgcn():
             steps += 1
 
         avg_loss = total_loss / max(steps, 1)
-        print(f"Epoch {epoch:03d} | loss={avg_loss:.6f}")
+        print(f"Epoch {epoch:02d} | loss={avg_loss:.6f}")
 
         if epoch % cfg.eval_every == 0:
             model.eval()
-            val_res = evaluate_sampled(model, train_csr, val_csr, num_items, device)
+
+            if cfg.eval_mode == "full":
+                val_res = evaluate_full_ranking(model, train_csr, val_csr, num_items, device)
+            else:
+                val_res = evaluate_sampled(model, train_csr, val_csr, num_items, device)
 
             selK = max(cfg.Ks)
             val_score = val_res[selK]["recall"]
@@ -674,17 +698,21 @@ def train_lightgcn():
                 torch.save(model.state_dict(), best_path)
                 print(f"  ✅ Saved best model to {best_path} (val Recall@{selK}={best_val:.4f})")
 
-    # Load best and test
     if best_path.exists():
         model.load_state_dict(torch.load(best_path, map_location=device))
         model.eval()
 
-    test_res = evaluate_sampled(model, train_csr, test_csr, num_items, device)
+    if cfg.eval_mode == "full":
+        test_res = evaluate_full_ranking(model, train_csr, test_csr, num_items, device)
+    else:
+        test_res = evaluate_sampled(model, train_csr, test_csr, num_items, device)
 
     print("\nTEST metrics:")
     for K in cfg.Ks:
         r = test_res[K]
         print(f"  K={K}: P={r['precision']:.4f} R={r['recall']:.4f} NDCG={r['ndcg']:.4f} ({r['mode']})")
+
+    return test_res
 
 
 def main():

@@ -1,0 +1,1632 @@
+Graph files not found. Building graph first...
+[WARN] Skipping invalid JSON at line 572966
+[WARN] Skipping invalid JSON at line 573456
+[WARN] Total invalid JSON lines skipped: 2
+
+PASS1 done.
+Users: 58867 Items: 261728 Positive edges: 463714
+Split counts: {'train': 370745, 'val': 46461, 'test': 46508}
+[WARN] Skipping invalid JSON at line 572966
+[WARN] Skipping invalid JSON at line 573456
+[WARN] Total invalid JSON lines skipped: 2
+
+✅ Saved graph files to: /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent
+Loaded edges. Users=58,867 Items=261,728 Train=370,745 Val=46,461 Test=46,508
+Using device: cuda
+[CRED] Cred CSV not found: /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/graph_pyg_parent_asin/credibility_scores_minmax.csv -> using all ones.
+Epoch 01 | loss=0.692829
+VAL metrics:
+  K=10: P=0.0135 R=0.1345 NDCG=0.0709 (sampled(1pos+neg))
+  K=20: P=0.0112 R=0.2243 NDCG=0.0933 (sampled(1pos+neg))
+  ✅ Saved best model to /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent/model/best_model.pt (val Recall@20=0.2243)
+Epoch 02 | loss=0.691696
+VAL metrics:
+  K=10: P=0.0208 R=0.2084 NDCG=0.1240 (sampled(1pos+neg))
+  K=20: P=0.0144 R=0.2876 NDCG=0.1438 (sampled(1pos+neg))
+  ✅ Saved best model to /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent/model/best_model.pt (val Recall@20=0.2876)
+Epoch 03 | loss=0.689043
+VAL metrics:
+  K=10: P=0.0254 R=0.2545 NDCG=0.1623 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3284 NDCG=0.1808 (sampled(1pos+neg))
+  ✅ Saved best model to /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent/model/best_model.pt (val Recall@20=0.3284)
+Epoch 04 | loss=0.684461
+VAL metrics:
+  K=10: P=0.0276 R=0.2764 NDCG=0.1815 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3450 NDCG=0.1987 (sampled(1pos+neg))
+  ✅ Saved best model to /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent/model/best_model.pt (val Recall@20=0.3450)
+Epoch 05 | loss=0.678593
+VAL metrics:
+  K=10: P=0.0288 R=0.2878 NDCG=0.1911 (sampled(1pos+neg))
+  K=20: P=0.0178 R=0.3554 NDCG=0.2081 (sampled(1pos+neg))
+  ✅ Saved best model to /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent/model/best_model.pt (val Recall@20=0.3554)
+Epoch 06 | loss=0.670617
+VAL metrics:
+  K=10: P=0.0295 R=0.2946 NDCG=0.1967 (sampled(1pos+neg))
+  K=20: P=0.0180 R=0.3601 NDCG=0.2132 (sampled(1pos+neg))
+  ✅ Saved best model to /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent/model/best_model.pt (val Recall@20=0.3601)
+Epoch 07 | loss=0.661499
+VAL metrics:
+  K=10: P=0.0299 R=0.2985 NDCG=0.2002 (sampled(1pos+neg))
+  K=20: P=0.0182 R=0.3645 NDCG=0.2167 (sampled(1pos+neg))
+  ✅ Saved best model to /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent/model/best_model.pt (val Recall@20=0.3645)
+Epoch 08 | loss=0.650428
+VAL metrics:
+  K=10: P=0.0301 R=0.3009 NDCG=0.2026 (sampled(1pos+neg))
+  K=20: P=0.0184 R=0.3672 NDCG=0.2192 (sampled(1pos+neg))
+  ✅ Saved best model to /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent/model/best_model.pt (val Recall@20=0.3672)
+Epoch 09 | loss=0.638382
+VAL metrics:
+  K=10: P=0.0301 R=0.3013 NDCG=0.2034 (sampled(1pos+neg))
+  K=20: P=0.0183 R=0.3665 NDCG=0.2198 (sampled(1pos+neg))
+Epoch 10 | loss=0.624696
+VAL metrics:
+  K=10: P=0.0302 R=0.3024 NDCG=0.2043 (sampled(1pos+neg))
+  K=20: P=0.0184 R=0.3685 NDCG=0.2209 (sampled(1pos+neg))
+  ✅ Saved best model to /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent/model/best_model.pt (val Recall@20=0.3685)
+Epoch 11 | loss=0.610033
+VAL metrics:
+  K=10: P=0.0302 R=0.3025 NDCG=0.2048 (sampled(1pos+neg))
+  K=20: P=0.0184 R=0.3683 NDCG=0.2214 (sampled(1pos+neg))
+Epoch 12 | loss=0.594177
+VAL metrics:
+  K=10: P=0.0303 R=0.3032 NDCG=0.2053 (sampled(1pos+neg))
+  K=20: P=0.0184 R=0.3689 NDCG=0.2218 (sampled(1pos+neg))
+  ✅ Saved best model to /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent/model/best_model.pt (val Recall@20=0.3689)
+Epoch 13 | loss=0.577257
+VAL metrics:
+  K=10: P=0.0304 R=0.3040 NDCG=0.2057 (sampled(1pos+neg))
+  K=20: P=0.0185 R=0.3692 NDCG=0.2220 (sampled(1pos+neg))
+  ✅ Saved best model to /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent/model/best_model.pt (val Recall@20=0.3692)
+Epoch 14 | loss=0.561053
+VAL metrics:
+  K=10: P=0.0304 R=0.3035 NDCG=0.2057 (sampled(1pos+neg))
+  K=20: P=0.0185 R=0.3704 NDCG=0.2225 (sampled(1pos+neg))
+  ✅ Saved best model to /home/dsai-st125024/project/Beyond-Binary-Fake-User-Detection-A-Credibility-Aware-Graph-based-Recommender-System/dataset/lightgcn_pipeline_cu_message_parent/model/best_model.pt (val Recall@20=0.3704)
+Epoch 15 | loss=0.542930
+VAL metrics:
+  K=10: P=0.0303 R=0.3029 NDCG=0.2057 (sampled(1pos+neg))
+  K=20: P=0.0185 R=0.3703 NDCG=0.2227 (sampled(1pos+neg))
+Epoch 16 | loss=0.526285
+VAL metrics:
+  K=10: P=0.0303 R=0.3030 NDCG=0.2059 (sampled(1pos+neg))
+  K=20: P=0.0185 R=0.3695 NDCG=0.2226 (sampled(1pos+neg))
+Epoch 17 | loss=0.509694
+VAL metrics:
+  K=10: P=0.0303 R=0.3034 NDCG=0.2060 (sampled(1pos+neg))
+  K=20: P=0.0185 R=0.3695 NDCG=0.2225 (sampled(1pos+neg))
+Epoch 18 | loss=0.493095
+VAL metrics:
+  K=10: P=0.0304 R=0.3037 NDCG=0.2059 (sampled(1pos+neg))
+  K=20: P=0.0185 R=0.3694 NDCG=0.2223 (sampled(1pos+neg))
+Epoch 19 | loss=0.477375
+VAL metrics:
+  K=10: P=0.0304 R=0.3039 NDCG=0.2058 (sampled(1pos+neg))
+  K=20: P=0.0185 R=0.3693 NDCG=0.2221 (sampled(1pos+neg))
+Epoch 20 | loss=0.462436
+VAL metrics:
+  K=10: P=0.0304 R=0.3036 NDCG=0.2056 (sampled(1pos+neg))
+  K=20: P=0.0185 R=0.3692 NDCG=0.2220 (sampled(1pos+neg))
+Epoch 21 | loss=0.449572
+VAL metrics:
+  K=10: P=0.0303 R=0.3032 NDCG=0.2057 (sampled(1pos+neg))
+  K=20: P=0.0185 R=0.3691 NDCG=0.2222 (sampled(1pos+neg))
+Epoch 22 | loss=0.433143
+VAL metrics:
+  K=10: P=0.0303 R=0.3026 NDCG=0.2053 (sampled(1pos+neg))
+  K=20: P=0.0184 R=0.3683 NDCG=0.2218 (sampled(1pos+neg))
+Epoch 23 | loss=0.420791
+VAL metrics:
+  K=10: P=0.0303 R=0.3030 NDCG=0.2054 (sampled(1pos+neg))
+  K=20: P=0.0184 R=0.3673 NDCG=0.2216 (sampled(1pos+neg))
+Epoch 24 | loss=0.406165
+VAL metrics:
+  K=10: P=0.0303 R=0.3030 NDCG=0.2053 (sampled(1pos+neg))
+  K=20: P=0.0184 R=0.3672 NDCG=0.2214 (sampled(1pos+neg))
+Epoch 25 | loss=0.393969
+VAL metrics:
+  K=10: P=0.0303 R=0.3032 NDCG=0.2053 (sampled(1pos+neg))
+  K=20: P=0.0184 R=0.3671 NDCG=0.2214 (sampled(1pos+neg))
+Epoch 26 | loss=0.382366
+VAL metrics:
+  K=10: P=0.0303 R=0.3032 NDCG=0.2053 (sampled(1pos+neg))
+  K=20: P=0.0183 R=0.3664 NDCG=0.2212 (sampled(1pos+neg))
+Epoch 27 | loss=0.370124
+VAL metrics:
+  K=10: P=0.0302 R=0.3024 NDCG=0.2049 (sampled(1pos+neg))
+  K=20: P=0.0183 R=0.3662 NDCG=0.2209 (sampled(1pos+neg))
+Epoch 28 | loss=0.362443
+VAL metrics:
+  K=10: P=0.0303 R=0.3027 NDCG=0.2050 (sampled(1pos+neg))
+  K=20: P=0.0183 R=0.3661 NDCG=0.2209 (sampled(1pos+neg))
+Epoch 29 | loss=0.350598
+VAL metrics:
+  K=10: P=0.0303 R=0.3027 NDCG=0.2049 (sampled(1pos+neg))
+  K=20: P=0.0183 R=0.3658 NDCG=0.2207 (sampled(1pos+neg))
+Epoch 30 | loss=0.340176
+VAL metrics:
+  K=10: P=0.0302 R=0.3025 NDCG=0.2050 (sampled(1pos+neg))
+  K=20: P=0.0183 R=0.3655 NDCG=0.2208 (sampled(1pos+neg))
+Epoch 31 | loss=0.331073
+VAL metrics:
+  K=10: P=0.0302 R=0.3025 NDCG=0.2048 (sampled(1pos+neg))
+  K=20: P=0.0183 R=0.3654 NDCG=0.2206 (sampled(1pos+neg))
+Epoch 32 | loss=0.322974
+VAL metrics:
+  K=10: P=0.0303 R=0.3027 NDCG=0.2048 (sampled(1pos+neg))
+  K=20: P=0.0183 R=0.3655 NDCG=0.2205 (sampled(1pos+neg))
+Epoch 33 | loss=0.314151
+VAL metrics:
+  K=10: P=0.0302 R=0.3016 NDCG=0.2045 (sampled(1pos+neg))
+  K=20: P=0.0183 R=0.3655 NDCG=0.2204 (sampled(1pos+neg))
+Epoch 34 | loss=0.308214
+VAL metrics:
+  K=10: P=0.0302 R=0.3015 NDCG=0.2043 (sampled(1pos+neg))
+  K=20: P=0.0182 R=0.3650 NDCG=0.2202 (sampled(1pos+neg))
+Epoch 35 | loss=0.297120
+VAL metrics:
+  K=10: P=0.0302 R=0.3017 NDCG=0.2042 (sampled(1pos+neg))
+  K=20: P=0.0182 R=0.3642 NDCG=0.2198 (sampled(1pos+neg))
+Epoch 36 | loss=0.289748
+VAL metrics:
+  K=10: P=0.0301 R=0.3010 NDCG=0.2040 (sampled(1pos+neg))
+  K=20: P=0.0182 R=0.3638 NDCG=0.2197 (sampled(1pos+neg))
+Epoch 37 | loss=0.284987
+VAL metrics:
+  K=10: P=0.0301 R=0.3013 NDCG=0.2040 (sampled(1pos+neg))
+  K=20: P=0.0181 R=0.3625 NDCG=0.2193 (sampled(1pos+neg))
+Epoch 38 | loss=0.278009
+VAL metrics:
+  K=10: P=0.0301 R=0.3007 NDCG=0.2037 (sampled(1pos+neg))
+  K=20: P=0.0181 R=0.3624 NDCG=0.2191 (sampled(1pos+neg))
+Epoch 39 | loss=0.273705
+VAL metrics:
+  K=10: P=0.0300 R=0.3002 NDCG=0.2035 (sampled(1pos+neg))
+  K=20: P=0.0181 R=0.3613 NDCG=0.2188 (sampled(1pos+neg))
+Epoch 40 | loss=0.268118
+VAL metrics:
+  K=10: P=0.0299 R=0.2991 NDCG=0.2030 (sampled(1pos+neg))
+  K=20: P=0.0181 R=0.3615 NDCG=0.2187 (sampled(1pos+neg))
+Epoch 41 | loss=0.258341
+VAL metrics:
+  K=10: P=0.0299 R=0.2986 NDCG=0.2030 (sampled(1pos+neg))
+  K=20: P=0.0181 R=0.3611 NDCG=0.2187 (sampled(1pos+neg))
+Epoch 42 | loss=0.255261
+VAL metrics:
+  K=10: P=0.0299 R=0.2985 NDCG=0.2028 (sampled(1pos+neg))
+  K=20: P=0.0180 R=0.3608 NDCG=0.2185 (sampled(1pos+neg))
+Epoch 43 | loss=0.247760
+VAL metrics:
+  K=10: P=0.0298 R=0.2981 NDCG=0.2027 (sampled(1pos+neg))
+  K=20: P=0.0180 R=0.3603 NDCG=0.2183 (sampled(1pos+neg))
+Epoch 44 | loss=0.243170
+VAL metrics:
+  K=10: P=0.0298 R=0.2981 NDCG=0.2027 (sampled(1pos+neg))
+  K=20: P=0.0180 R=0.3603 NDCG=0.2183 (sampled(1pos+neg))
+Epoch 45 | loss=0.237458
+VAL metrics:
+  K=10: P=0.0298 R=0.2978 NDCG=0.2025 (sampled(1pos+neg))
+  K=20: P=0.0180 R=0.3605 NDCG=0.2182 (sampled(1pos+neg))
+Epoch 46 | loss=0.231433
+VAL metrics:
+  K=10: P=0.0298 R=0.2977 NDCG=0.2024 (sampled(1pos+neg))
+  K=20: P=0.0180 R=0.3599 NDCG=0.2180 (sampled(1pos+neg))
+Epoch 47 | loss=0.230210
+VAL metrics:
+  K=10: P=0.0298 R=0.2978 NDCG=0.2024 (sampled(1pos+neg))
+  K=20: P=0.0180 R=0.3594 NDCG=0.2179 (sampled(1pos+neg))
+Epoch 48 | loss=0.228614
+VAL metrics:
+  K=10: P=0.0298 R=0.2977 NDCG=0.2024 (sampled(1pos+neg))
+  K=20: P=0.0179 R=0.3584 NDCG=0.2176 (sampled(1pos+neg))
+Epoch 49 | loss=0.219405
+VAL metrics:
+  K=10: P=0.0298 R=0.2982 NDCG=0.2025 (sampled(1pos+neg))
+  K=20: P=0.0179 R=0.3589 NDCG=0.2177 (sampled(1pos+neg))
+Epoch 50 | loss=0.219746
+VAL metrics:
+  K=10: P=0.0298 R=0.2981 NDCG=0.2024 (sampled(1pos+neg))
+  K=20: P=0.0179 R=0.3587 NDCG=0.2175 (sampled(1pos+neg))
+Epoch 51 | loss=0.215068
+VAL metrics:
+  K=10: P=0.0298 R=0.2977 NDCG=0.2021 (sampled(1pos+neg))
+  K=20: P=0.0179 R=0.3583 NDCG=0.2173 (sampled(1pos+neg))
+Epoch 52 | loss=0.210643
+VAL metrics:
+  K=10: P=0.0297 R=0.2971 NDCG=0.2019 (sampled(1pos+neg))
+  K=20: P=0.0179 R=0.3577 NDCG=0.2171 (sampled(1pos+neg))
+Epoch 53 | loss=0.207733
+VAL metrics:
+  K=10: P=0.0297 R=0.2974 NDCG=0.2018 (sampled(1pos+neg))
+  K=20: P=0.0179 R=0.3576 NDCG=0.2169 (sampled(1pos+neg))
+Epoch 54 | loss=0.201952
+VAL metrics:
+  K=10: P=0.0297 R=0.2970 NDCG=0.2016 (sampled(1pos+neg))
+  K=20: P=0.0179 R=0.3575 NDCG=0.2168 (sampled(1pos+neg))
+Epoch 55 | loss=0.201679
+VAL metrics:
+  K=10: P=0.0298 R=0.2976 NDCG=0.2018 (sampled(1pos+neg))
+  K=20: P=0.0178 R=0.3569 NDCG=0.2167 (sampled(1pos+neg))
+Epoch 56 | loss=0.198818
+VAL metrics:
+  K=10: P=0.0297 R=0.2975 NDCG=0.2017 (sampled(1pos+neg))
+  K=20: P=0.0178 R=0.3569 NDCG=0.2166 (sampled(1pos+neg))
+Epoch 57 | loss=0.194485
+VAL metrics:
+  K=10: P=0.0297 R=0.2973 NDCG=0.2014 (sampled(1pos+neg))
+  K=20: P=0.0178 R=0.3570 NDCG=0.2164 (sampled(1pos+neg))
+Epoch 58 | loss=0.191867
+VAL metrics:
+  K=10: P=0.0297 R=0.2969 NDCG=0.2012 (sampled(1pos+neg))
+  K=20: P=0.0178 R=0.3563 NDCG=0.2161 (sampled(1pos+neg))
+Epoch 59 | loss=0.189233
+VAL metrics:
+  K=10: P=0.0297 R=0.2966 NDCG=0.2009 (sampled(1pos+neg))
+  K=20: P=0.0178 R=0.3563 NDCG=0.2158 (sampled(1pos+neg))
+Epoch 60 | loss=0.187136
+VAL metrics:
+  K=10: P=0.0297 R=0.2966 NDCG=0.2008 (sampled(1pos+neg))
+  K=20: P=0.0178 R=0.3563 NDCG=0.2158 (sampled(1pos+neg))
+Epoch 61 | loss=0.181912
+VAL metrics:
+  K=10: P=0.0296 R=0.2962 NDCG=0.2006 (sampled(1pos+neg))
+  K=20: P=0.0178 R=0.3562 NDCG=0.2157 (sampled(1pos+neg))
+Epoch 62 | loss=0.178454
+VAL metrics:
+  K=10: P=0.0296 R=0.2959 NDCG=0.2005 (sampled(1pos+neg))
+  K=20: P=0.0178 R=0.3558 NDCG=0.2155 (sampled(1pos+neg))
+Epoch 63 | loss=0.179187
+VAL metrics:
+  K=10: P=0.0296 R=0.2957 NDCG=0.2004 (sampled(1pos+neg))
+  K=20: P=0.0178 R=0.3553 NDCG=0.2154 (sampled(1pos+neg))
+Epoch 64 | loss=0.175166
+VAL metrics:
+  K=10: P=0.0295 R=0.2954 NDCG=0.2002 (sampled(1pos+neg))
+  K=20: P=0.0178 R=0.3551 NDCG=0.2152 (sampled(1pos+neg))
+Epoch 65 | loss=0.172845
+VAL metrics:
+  K=10: P=0.0295 R=0.2949 NDCG=0.1999 (sampled(1pos+neg))
+  K=20: P=0.0178 R=0.3551 NDCG=0.2150 (sampled(1pos+neg))
+Epoch 66 | loss=0.170402
+VAL metrics:
+  K=10: P=0.0295 R=0.2946 NDCG=0.1998 (sampled(1pos+neg))
+  K=20: P=0.0177 R=0.3546 NDCG=0.2148 (sampled(1pos+neg))
+Epoch 67 | loss=0.168961
+VAL metrics:
+  K=10: P=0.0294 R=0.2945 NDCG=0.1997 (sampled(1pos+neg))
+  K=20: P=0.0177 R=0.3547 NDCG=0.2148 (sampled(1pos+neg))
+Epoch 68 | loss=0.166891
+VAL metrics:
+  K=10: P=0.0295 R=0.2947 NDCG=0.1998 (sampled(1pos+neg))
+  K=20: P=0.0177 R=0.3546 NDCG=0.2148 (sampled(1pos+neg))
+Epoch 69 | loss=0.163954
+VAL metrics:
+  K=10: P=0.0294 R=0.2944 NDCG=0.1996 (sampled(1pos+neg))
+  K=20: P=0.0177 R=0.3546 NDCG=0.2147 (sampled(1pos+neg))
+Epoch 70 | loss=0.161580
+VAL metrics:
+  K=10: P=0.0295 R=0.2945 NDCG=0.1997 (sampled(1pos+neg))
+  K=20: P=0.0177 R=0.3550 NDCG=0.2148 (sampled(1pos+neg))
+Epoch 71 | loss=0.158906
+VAL metrics:
+  K=10: P=0.0294 R=0.2945 NDCG=0.1996 (sampled(1pos+neg))
+  K=20: P=0.0177 R=0.3540 NDCG=0.2145 (sampled(1pos+neg))
+Epoch 72 | loss=0.160157
+VAL metrics:
+  K=10: P=0.0294 R=0.2944 NDCG=0.1994 (sampled(1pos+neg))
+  K=20: P=0.0177 R=0.3540 NDCG=0.2144 (sampled(1pos+neg))
+Epoch 73 | loss=0.157148
+VAL metrics:
+  K=10: P=0.0294 R=0.2939 NDCG=0.1992 (sampled(1pos+neg))
+  K=20: P=0.0177 R=0.3538 NDCG=0.2143 (sampled(1pos+neg))
+Epoch 74 | loss=0.151707
+VAL metrics:
+  K=10: P=0.0293 R=0.2933 NDCG=0.1990 (sampled(1pos+neg))
+  K=20: P=0.0177 R=0.3534 NDCG=0.2141 (sampled(1pos+neg))
+Epoch 75 | loss=0.153913
+VAL metrics:
+  K=10: P=0.0293 R=0.2931 NDCG=0.1990 (sampled(1pos+neg))
+  K=20: P=0.0176 R=0.3528 NDCG=0.2140 (sampled(1pos+neg))
+Epoch 76 | loss=0.155349
+VAL metrics:
+  K=10: P=0.0293 R=0.2929 NDCG=0.1988 (sampled(1pos+neg))
+  K=20: P=0.0176 R=0.3526 NDCG=0.2138 (sampled(1pos+neg))
+Epoch 77 | loss=0.150406
+VAL metrics:
+  K=10: P=0.0293 R=0.2930 NDCG=0.1987 (sampled(1pos+neg))
+  K=20: P=0.0176 R=0.3525 NDCG=0.2137 (sampled(1pos+neg))
+Epoch 78 | loss=0.148322
+VAL metrics:
+  K=10: P=0.0292 R=0.2925 NDCG=0.1984 (sampled(1pos+neg))
+  K=20: P=0.0176 R=0.3523 NDCG=0.2134 (sampled(1pos+neg))
+Epoch 79 | loss=0.146349
+VAL metrics:
+  K=10: P=0.0293 R=0.2927 NDCG=0.1984 (sampled(1pos+neg))
+  K=20: P=0.0176 R=0.3523 NDCG=0.2134 (sampled(1pos+neg))
+Epoch 80 | loss=0.145368
+VAL metrics:
+  K=10: P=0.0293 R=0.2931 NDCG=0.1985 (sampled(1pos+neg))
+  K=20: P=0.0176 R=0.3518 NDCG=0.2132 (sampled(1pos+neg))
+Epoch 81 | loss=0.143829
+VAL metrics:
+  K=10: P=0.0293 R=0.2932 NDCG=0.1984 (sampled(1pos+neg))
+  K=20: P=0.0176 R=0.3518 NDCG=0.2131 (sampled(1pos+neg))
+Epoch 82 | loss=0.143241
+VAL metrics:
+  K=10: P=0.0293 R=0.2931 NDCG=0.1982 (sampled(1pos+neg))
+  K=20: P=0.0176 R=0.3515 NDCG=0.2129 (sampled(1pos+neg))
+Epoch 83 | loss=0.141108
+VAL metrics:
+  K=10: P=0.0293 R=0.2930 NDCG=0.1981 (sampled(1pos+neg))
+  K=20: P=0.0176 R=0.3513 NDCG=0.2127 (sampled(1pos+neg))
+Epoch 84 | loss=0.136912
+VAL metrics:
+  K=10: P=0.0292 R=0.2924 NDCG=0.1978 (sampled(1pos+neg))
+  K=20: P=0.0176 R=0.3512 NDCG=0.2126 (sampled(1pos+neg))
+Epoch 85 | loss=0.139095
+VAL metrics:
+  K=10: P=0.0292 R=0.2924 NDCG=0.1978 (sampled(1pos+neg))
+  K=20: P=0.0176 R=0.3514 NDCG=0.2126 (sampled(1pos+neg))
+Epoch 86 | loss=0.136891
+VAL metrics:
+  K=10: P=0.0292 R=0.2922 NDCG=0.1975 (sampled(1pos+neg))
+  K=20: P=0.0176 R=0.3511 NDCG=0.2123 (sampled(1pos+neg))
+Epoch 87 | loss=0.134029
+VAL metrics:
+  K=10: P=0.0292 R=0.2923 NDCG=0.1977 (sampled(1pos+neg))
+  K=20: P=0.0175 R=0.3507 NDCG=0.2124 (sampled(1pos+neg))
+Epoch 88 | loss=0.133584
+VAL metrics:
+  K=10: P=0.0292 R=0.2918 NDCG=0.1975 (sampled(1pos+neg))
+  K=20: P=0.0175 R=0.3506 NDCG=0.2123 (sampled(1pos+neg))
+Epoch 89 | loss=0.134008
+VAL metrics:
+  K=10: P=0.0292 R=0.2917 NDCG=0.1974 (sampled(1pos+neg))
+  K=20: P=0.0175 R=0.3503 NDCG=0.2120 (sampled(1pos+neg))
+Epoch 90 | loss=0.128324
+VAL metrics:
+  K=10: P=0.0292 R=0.2918 NDCG=0.1975 (sampled(1pos+neg))
+  K=20: P=0.0175 R=0.3498 NDCG=0.2120 (sampled(1pos+neg))
+Epoch 91 | loss=0.128317
+VAL metrics:
+  K=10: P=0.0292 R=0.2916 NDCG=0.1974 (sampled(1pos+neg))
+  K=20: P=0.0175 R=0.3492 NDCG=0.2119 (sampled(1pos+neg))
+Epoch 92 | loss=0.129203
+VAL metrics:
+  K=10: P=0.0291 R=0.2913 NDCG=0.1972 (sampled(1pos+neg))
+  K=20: P=0.0175 R=0.3493 NDCG=0.2118 (sampled(1pos+neg))
+Epoch 93 | loss=0.125393
+VAL metrics:
+  K=10: P=0.0292 R=0.2915 NDCG=0.1972 (sampled(1pos+neg))
+  K=20: P=0.0175 R=0.3494 NDCG=0.2117 (sampled(1pos+neg))
+Epoch 94 | loss=0.127094
+VAL metrics:
+  K=10: P=0.0292 R=0.2916 NDCG=0.1972 (sampled(1pos+neg))
+  K=20: P=0.0175 R=0.3492 NDCG=0.2117 (sampled(1pos+neg))
+Epoch 95 | loss=0.124078
+VAL metrics:
+  K=10: P=0.0291 R=0.2911 NDCG=0.1970 (sampled(1pos+neg))
+  K=20: P=0.0175 R=0.3492 NDCG=0.2116 (sampled(1pos+neg))
+Epoch 96 | loss=0.122836
+VAL metrics:
+  K=10: P=0.0291 R=0.2906 NDCG=0.1966 (sampled(1pos+neg))
+  K=20: P=0.0175 R=0.3491 NDCG=0.2113 (sampled(1pos+neg))
+Epoch 97 | loss=0.125586
+VAL metrics:
+  K=10: P=0.0291 R=0.2906 NDCG=0.1965 (sampled(1pos+neg))
+  K=20: P=0.0175 R=0.3494 NDCG=0.2112 (sampled(1pos+neg))
+Epoch 98 | loss=0.120634
+VAL metrics:
+  K=10: P=0.0290 R=0.2901 NDCG=0.1964 (sampled(1pos+neg))
+  K=20: P=0.0174 R=0.3489 NDCG=0.2112 (sampled(1pos+neg))
+Epoch 99 | loss=0.121718
+VAL metrics:
+  K=10: P=0.0290 R=0.2897 NDCG=0.1961 (sampled(1pos+neg))
+  K=20: P=0.0174 R=0.3488 NDCG=0.2110 (sampled(1pos+neg))
+Epoch 100 | loss=0.120267
+VAL metrics:
+  K=10: P=0.0290 R=0.2900 NDCG=0.1961 (sampled(1pos+neg))
+  K=20: P=0.0174 R=0.3483 NDCG=0.2108 (sampled(1pos+neg))
+Epoch 101 | loss=0.116673
+VAL metrics:
+  K=10: P=0.0290 R=0.2900 NDCG=0.1961 (sampled(1pos+neg))
+  K=20: P=0.0174 R=0.3486 NDCG=0.2108 (sampled(1pos+neg))
+Epoch 102 | loss=0.117794
+VAL metrics:
+  K=10: P=0.0290 R=0.2900 NDCG=0.1961 (sampled(1pos+neg))
+  K=20: P=0.0174 R=0.3482 NDCG=0.2107 (sampled(1pos+neg))
+Epoch 103 | loss=0.117434
+VAL metrics:
+  K=10: P=0.0291 R=0.2905 NDCG=0.1962 (sampled(1pos+neg))
+  K=20: P=0.0174 R=0.3479 NDCG=0.2106 (sampled(1pos+neg))
+Epoch 104 | loss=0.114955
+VAL metrics:
+  K=10: P=0.0290 R=0.2900 NDCG=0.1960 (sampled(1pos+neg))
+  K=20: P=0.0174 R=0.3473 NDCG=0.2104 (sampled(1pos+neg))
+Epoch 105 | loss=0.114386
+VAL metrics:
+  K=10: P=0.0290 R=0.2896 NDCG=0.1958 (sampled(1pos+neg))
+  K=20: P=0.0174 R=0.3474 NDCG=0.2103 (sampled(1pos+neg))
+Epoch 106 | loss=0.111982
+VAL metrics:
+  K=10: P=0.0289 R=0.2892 NDCG=0.1955 (sampled(1pos+neg))
+  K=20: P=0.0173 R=0.3470 NDCG=0.2100 (sampled(1pos+neg))
+Epoch 107 | loss=0.111556
+VAL metrics:
+  K=10: P=0.0289 R=0.2891 NDCG=0.1954 (sampled(1pos+neg))
+  K=20: P=0.0173 R=0.3468 NDCG=0.2099 (sampled(1pos+neg))
+Epoch 108 | loss=0.112164
+VAL metrics:
+  K=10: P=0.0289 R=0.2890 NDCG=0.1953 (sampled(1pos+neg))
+  K=20: P=0.0173 R=0.3466 NDCG=0.2098 (sampled(1pos+neg))
+Epoch 109 | loss=0.110770
+VAL metrics:
+  K=10: P=0.0289 R=0.2888 NDCG=0.1952 (sampled(1pos+neg))
+  K=20: P=0.0173 R=0.3463 NDCG=0.2096 (sampled(1pos+neg))
+Epoch 110 | loss=0.110848
+VAL metrics:
+  K=10: P=0.0289 R=0.2885 NDCG=0.1949 (sampled(1pos+neg))
+  K=20: P=0.0173 R=0.3459 NDCG=0.2094 (sampled(1pos+neg))
+Epoch 111 | loss=0.111134
+VAL metrics:
+  K=10: P=0.0288 R=0.2881 NDCG=0.1948 (sampled(1pos+neg))
+  K=20: P=0.0173 R=0.3455 NDCG=0.2092 (sampled(1pos+neg))
+Epoch 112 | loss=0.108889
+VAL metrics:
+  K=10: P=0.0288 R=0.2879 NDCG=0.1947 (sampled(1pos+neg))
+  K=20: P=0.0173 R=0.3455 NDCG=0.2092 (sampled(1pos+neg))
+Epoch 113 | loss=0.106682
+VAL metrics:
+  K=10: P=0.0288 R=0.2878 NDCG=0.1946 (sampled(1pos+neg))
+  K=20: P=0.0173 R=0.3450 NDCG=0.2090 (sampled(1pos+neg))
+Epoch 114 | loss=0.108712
+VAL metrics:
+  K=10: P=0.0288 R=0.2876 NDCG=0.1944 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3449 NDCG=0.2088 (sampled(1pos+neg))
+Epoch 115 | loss=0.108214
+VAL metrics:
+  K=10: P=0.0288 R=0.2878 NDCG=0.1945 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3447 NDCG=0.2088 (sampled(1pos+neg))
+Epoch 116 | loss=0.105763
+VAL metrics:
+  K=10: P=0.0288 R=0.2877 NDCG=0.1943 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3446 NDCG=0.2086 (sampled(1pos+neg))
+Epoch 117 | loss=0.104352
+VAL metrics:
+  K=10: P=0.0287 R=0.2872 NDCG=0.1941 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3442 NDCG=0.2085 (sampled(1pos+neg))
+Epoch 118 | loss=0.104815
+VAL metrics:
+  K=10: P=0.0287 R=0.2874 NDCG=0.1941 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3440 NDCG=0.2084 (sampled(1pos+neg))
+Epoch 119 | loss=0.104049
+VAL metrics:
+  K=10: P=0.0287 R=0.2869 NDCG=0.1939 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3443 NDCG=0.2083 (sampled(1pos+neg))
+Epoch 120 | loss=0.102327
+VAL metrics:
+  K=10: P=0.0287 R=0.2866 NDCG=0.1938 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3445 NDCG=0.2084 (sampled(1pos+neg))
+Epoch 121 | loss=0.102548
+VAL metrics:
+  K=10: P=0.0286 R=0.2863 NDCG=0.1936 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3444 NDCG=0.2083 (sampled(1pos+neg))
+Epoch 122 | loss=0.099630
+VAL metrics:
+  K=10: P=0.0286 R=0.2862 NDCG=0.1937 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3436 NDCG=0.2082 (sampled(1pos+neg))
+Epoch 123 | loss=0.100168
+VAL metrics:
+  K=10: P=0.0286 R=0.2862 NDCG=0.1935 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3436 NDCG=0.2080 (sampled(1pos+neg))
+Epoch 124 | loss=0.099787
+VAL metrics:
+  K=10: P=0.0286 R=0.2862 NDCG=0.1935 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3436 NDCG=0.2079 (sampled(1pos+neg))
+Epoch 125 | loss=0.097995
+VAL metrics:
+  K=10: P=0.0286 R=0.2861 NDCG=0.1935 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3434 NDCG=0.2079 (sampled(1pos+neg))
+Epoch 126 | loss=0.098234
+VAL metrics:
+  K=10: P=0.0286 R=0.2858 NDCG=0.1933 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3433 NDCG=0.2078 (sampled(1pos+neg))
+Epoch 127 | loss=0.097513
+VAL metrics:
+  K=10: P=0.0286 R=0.2858 NDCG=0.1932 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3428 NDCG=0.2076 (sampled(1pos+neg))
+Epoch 128 | loss=0.098257
+VAL metrics:
+  K=10: P=0.0286 R=0.2857 NDCG=0.1930 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3429 NDCG=0.2074 (sampled(1pos+neg))
+Epoch 129 | loss=0.094448
+VAL metrics:
+  K=10: P=0.0285 R=0.2852 NDCG=0.1927 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3428 NDCG=0.2072 (sampled(1pos+neg))
+Epoch 130 | loss=0.092329
+VAL metrics:
+  K=10: P=0.0285 R=0.2853 NDCG=0.1925 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3428 NDCG=0.2070 (sampled(1pos+neg))
+Epoch 131 | loss=0.093177
+VAL metrics:
+  K=10: P=0.0285 R=0.2853 NDCG=0.1925 (sampled(1pos+neg))
+  K=20: P=0.0172 R=0.3430 NDCG=0.2070 (sampled(1pos+neg))
+Epoch 132 | loss=0.090960
+VAL metrics:
+  K=10: P=0.0285 R=0.2850 NDCG=0.1923 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3429 NDCG=0.2068 (sampled(1pos+neg))
+Epoch 133 | loss=0.094859
+VAL metrics:
+  K=10: P=0.0285 R=0.2850 NDCG=0.1923 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3422 NDCG=0.2067 (sampled(1pos+neg))
+Epoch 134 | loss=0.091225
+VAL metrics:
+  K=10: P=0.0285 R=0.2847 NDCG=0.1922 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3421 NDCG=0.2066 (sampled(1pos+neg))
+Epoch 135 | loss=0.090386
+VAL metrics:
+  K=10: P=0.0284 R=0.2843 NDCG=0.1920 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3422 NDCG=0.2066 (sampled(1pos+neg))
+Epoch 136 | loss=0.089789
+VAL metrics:
+  K=10: P=0.0284 R=0.2840 NDCG=0.1918 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3420 NDCG=0.2064 (sampled(1pos+neg))
+Epoch 137 | loss=0.091449
+VAL metrics:
+  K=10: P=0.0284 R=0.2839 NDCG=0.1917 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3420 NDCG=0.2064 (sampled(1pos+neg))
+Epoch 138 | loss=0.091394
+VAL metrics:
+  K=10: P=0.0284 R=0.2837 NDCG=0.1917 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3415 NDCG=0.2062 (sampled(1pos+neg))
+Epoch 139 | loss=0.089968
+VAL metrics:
+  K=10: P=0.0283 R=0.2832 NDCG=0.1914 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3415 NDCG=0.2061 (sampled(1pos+neg))
+Epoch 140 | loss=0.090289
+VAL metrics:
+  K=10: P=0.0283 R=0.2831 NDCG=0.1914 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3413 NDCG=0.2060 (sampled(1pos+neg))
+Epoch 141 | loss=0.090425
+VAL metrics:
+  K=10: P=0.0283 R=0.2827 NDCG=0.1910 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3414 NDCG=0.2059 (sampled(1pos+neg))
+Epoch 142 | loss=0.087203
+VAL metrics:
+  K=10: P=0.0282 R=0.2823 NDCG=0.1907 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3414 NDCG=0.2057 (sampled(1pos+neg))
+Epoch 143 | loss=0.086667
+VAL metrics:
+  K=10: P=0.0282 R=0.2823 NDCG=0.1906 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3411 NDCG=0.2054 (sampled(1pos+neg))
+Epoch 144 | loss=0.086594
+VAL metrics:
+  K=10: P=0.0282 R=0.2822 NDCG=0.1905 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3413 NDCG=0.2054 (sampled(1pos+neg))
+Epoch 145 | loss=0.087448
+VAL metrics:
+  K=10: P=0.0282 R=0.2819 NDCG=0.1904 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3411 NDCG=0.2053 (sampled(1pos+neg))
+Epoch 146 | loss=0.085436
+VAL metrics:
+  K=10: P=0.0282 R=0.2818 NDCG=0.1902 (sampled(1pos+neg))
+  K=20: P=0.0170 R=0.3409 NDCG=0.2051 (sampled(1pos+neg))
+Epoch 147 | loss=0.084651
+VAL metrics:
+  K=10: P=0.0282 R=0.2815 NDCG=0.1899 (sampled(1pos+neg))
+  K=20: P=0.0171 R=0.3412 NDCG=0.2049 (sampled(1pos+neg))
+Epoch 148 | loss=0.082052
+VAL metrics:
+  K=10: P=0.0281 R=0.2812 NDCG=0.1898 (sampled(1pos+neg))
+  K=20: P=0.0170 R=0.3408 NDCG=0.2048 (sampled(1pos+neg))
+Epoch 149 | loss=0.084848
+VAL metrics:
+  K=10: P=0.0281 R=0.2813 NDCG=0.1897 (sampled(1pos+neg))
+  K=20: P=0.0170 R=0.3406 NDCG=0.2046 (sampled(1pos+neg))
+Epoch 150 | loss=0.082303
+VAL metrics:
+  K=10: P=0.0281 R=0.2814 NDCG=0.1898 (sampled(1pos+neg))
+  K=20: P=0.0170 R=0.3405 NDCG=0.2047 (sampled(1pos+neg))
+Epoch 151 | loss=0.085730
+VAL metrics:
+  K=10: P=0.0281 R=0.2809 NDCG=0.1897 (sampled(1pos+neg))
+  K=20: P=0.0170 R=0.3404 NDCG=0.2047 (sampled(1pos+neg))
+Epoch 152 | loss=0.079950
+VAL metrics:
+  K=10: P=0.0281 R=0.2810 NDCG=0.1896 (sampled(1pos+neg))
+  K=20: P=0.0170 R=0.3403 NDCG=0.2045 (sampled(1pos+neg))
+Epoch 153 | loss=0.081452
+VAL metrics:
+  K=10: P=0.0281 R=0.2806 NDCG=0.1895 (sampled(1pos+neg))
+  K=20: P=0.0170 R=0.3402 NDCG=0.2045 (sampled(1pos+neg))
+Epoch 154 | loss=0.078650
+VAL metrics:
+  K=10: P=0.0280 R=0.2803 NDCG=0.1893 (sampled(1pos+neg))
+  K=20: P=0.0170 R=0.3400 NDCG=0.2043 (sampled(1pos+neg))
+Epoch 155 | loss=0.080028
+VAL metrics:
+  K=10: P=0.0281 R=0.2806 NDCG=0.1893 (sampled(1pos+neg))
+  K=20: P=0.0170 R=0.3398 NDCG=0.2042 (sampled(1pos+neg))
+Epoch 156 | loss=0.079412
+VAL metrics:
+  K=10: P=0.0281 R=0.2806 NDCG=0.1894 (sampled(1pos+neg))
+  K=20: P=0.0170 R=0.3396 NDCG=0.2042 (sampled(1pos+neg))
+Epoch 157 | loss=0.078625
+VAL metrics:
+  K=10: P=0.0281 R=0.2808 NDCG=0.1894 (sampled(1pos+neg))
+  K=20: P=0.0170 R=0.3395 NDCG=0.2041 (sampled(1pos+neg))
+Epoch 158 | loss=0.078217
+VAL metrics:
+  K=10: P=0.0281 R=0.2805 NDCG=0.1891 (sampled(1pos+neg))
+  K=20: P=0.0170 R=0.3392 NDCG=0.2039 (sampled(1pos+neg))
+Epoch 159 | loss=0.080394
+VAL metrics:
+  K=10: P=0.0280 R=0.2802 NDCG=0.1891 (sampled(1pos+neg))
+  K=20: P=0.0169 R=0.3385 NDCG=0.2037 (sampled(1pos+neg))
+Epoch 160 | loss=0.078332
+VAL metrics:
+  K=10: P=0.0280 R=0.2802 NDCG=0.1890 (sampled(1pos+neg))
+  K=20: P=0.0169 R=0.3384 NDCG=0.2036 (sampled(1pos+neg))
+Epoch 161 | loss=0.076770
+VAL metrics:
+  K=10: P=0.0280 R=0.2796 NDCG=0.1887 (sampled(1pos+neg))
+  K=20: P=0.0169 R=0.3385 NDCG=0.2035 (sampled(1pos+neg))
+Epoch 162 | loss=0.077221
+VAL metrics:
+  K=10: P=0.0279 R=0.2791 NDCG=0.1884 (sampled(1pos+neg))
+  K=20: P=0.0169 R=0.3381 NDCG=0.2032 (sampled(1pos+neg))
+Epoch 163 | loss=0.078129
+VAL metrics:
+  K=10: P=0.0279 R=0.2790 NDCG=0.1883 (sampled(1pos+neg))
+  K=20: P=0.0169 R=0.3379 NDCG=0.2032 (sampled(1pos+neg))
+Epoch 164 | loss=0.077444
+VAL metrics:
+  K=10: P=0.0279 R=0.2786 NDCG=0.1882 (sampled(1pos+neg))
+  K=20: P=0.0169 R=0.3376 NDCG=0.2030 (sampled(1pos+neg))
+Epoch 165 | loss=0.076446
+VAL metrics:
+  K=10: P=0.0278 R=0.2782 NDCG=0.1880 (sampled(1pos+neg))
+  K=20: P=0.0169 R=0.3376 NDCG=0.2029 (sampled(1pos+neg))
+Epoch 166 | loss=0.076320
+VAL metrics:
+  K=10: P=0.0278 R=0.2780 NDCG=0.1879 (sampled(1pos+neg))
+  K=20: P=0.0169 R=0.3374 NDCG=0.2028 (sampled(1pos+neg))
+Epoch 167 | loss=0.076024
+VAL metrics:
+  K=10: P=0.0278 R=0.2778 NDCG=0.1876 (sampled(1pos+neg))
+  K=20: P=0.0169 R=0.3372 NDCG=0.2026 (sampled(1pos+neg))
+Epoch 168 | loss=0.071764
+VAL metrics:
+  K=10: P=0.0278 R=0.2776 NDCG=0.1875 (sampled(1pos+neg))
+  K=20: P=0.0168 R=0.3368 NDCG=0.2024 (sampled(1pos+neg))
+Epoch 169 | loss=0.074988
+VAL metrics:
+  K=10: P=0.0278 R=0.2778 NDCG=0.1874 (sampled(1pos+neg))
+  K=20: P=0.0168 R=0.3368 NDCG=0.2023 (sampled(1pos+neg))
+Epoch 170 | loss=0.072518
+VAL metrics:
+  K=10: P=0.0278 R=0.2777 NDCG=0.1874 (sampled(1pos+neg))
+  K=20: P=0.0168 R=0.3362 NDCG=0.2022 (sampled(1pos+neg))
+Epoch 171 | loss=0.073035
+VAL metrics:
+  K=10: P=0.0278 R=0.2780 NDCG=0.1875 (sampled(1pos+neg))
+  K=20: P=0.0168 R=0.3360 NDCG=0.2021 (sampled(1pos+neg))
+Epoch 172 | loss=0.071316
+VAL metrics:
+  K=10: P=0.0278 R=0.2777 NDCG=0.1874 (sampled(1pos+neg))
+  K=20: P=0.0168 R=0.3364 NDCG=0.2022 (sampled(1pos+neg))
+Epoch 173 | loss=0.069800
+VAL metrics:
+  K=10: P=0.0278 R=0.2777 NDCG=0.1873 (sampled(1pos+neg))
+  K=20: P=0.0168 R=0.3360 NDCG=0.2020 (sampled(1pos+neg))
+Epoch 174 | loss=0.072047
+VAL metrics:
+  K=10: P=0.0277 R=0.2773 NDCG=0.1872 (sampled(1pos+neg))
+  K=20: P=0.0168 R=0.3358 NDCG=0.2019 (sampled(1pos+neg))
+Epoch 175 | loss=0.070511
+VAL metrics:
+  K=10: P=0.0277 R=0.2775 NDCG=0.1871 (sampled(1pos+neg))
+  K=20: P=0.0168 R=0.3358 NDCG=0.2018 (sampled(1pos+neg))
+Epoch 176 | loss=0.070824
+VAL metrics:
+  K=10: P=0.0278 R=0.2775 NDCG=0.1871 (sampled(1pos+neg))
+  K=20: P=0.0168 R=0.3353 NDCG=0.2016 (sampled(1pos+neg))
+Epoch 177 | loss=0.071788
+VAL metrics:
+  K=10: P=0.0278 R=0.2775 NDCG=0.1870 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3348 NDCG=0.2014 (sampled(1pos+neg))
+Epoch 178 | loss=0.068955
+VAL metrics:
+  K=10: P=0.0277 R=0.2774 NDCG=0.1869 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3347 NDCG=0.2013 (sampled(1pos+neg))
+Epoch 179 | loss=0.068491
+VAL metrics:
+  K=10: P=0.0277 R=0.2773 NDCG=0.1868 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3344 NDCG=0.2012 (sampled(1pos+neg))
+Epoch 180 | loss=0.071815
+VAL metrics:
+  K=10: P=0.0277 R=0.2769 NDCG=0.1865 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3337 NDCG=0.2008 (sampled(1pos+neg))
+Epoch 181 | loss=0.069738
+VAL metrics:
+  K=10: P=0.0277 R=0.2768 NDCG=0.1865 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3338 NDCG=0.2008 (sampled(1pos+neg))
+Epoch 182 | loss=0.069036
+VAL metrics:
+  K=10: P=0.0277 R=0.2768 NDCG=0.1864 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3339 NDCG=0.2008 (sampled(1pos+neg))
+Epoch 183 | loss=0.068957
+VAL metrics:
+  K=10: P=0.0276 R=0.2765 NDCG=0.1863 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3335 NDCG=0.2007 (sampled(1pos+neg))
+Epoch 184 | loss=0.065800
+VAL metrics:
+  K=10: P=0.0276 R=0.2763 NDCG=0.1862 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3334 NDCG=0.2006 (sampled(1pos+neg))
+Epoch 185 | loss=0.066455
+VAL metrics:
+  K=10: P=0.0276 R=0.2760 NDCG=0.1859 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3338 NDCG=0.2004 (sampled(1pos+neg))
+Epoch 186 | loss=0.067392
+VAL metrics:
+  K=10: P=0.0276 R=0.2758 NDCG=0.1857 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3335 NDCG=0.2002 (sampled(1pos+neg))
+Epoch 187 | loss=0.064799
+VAL metrics:
+  K=10: P=0.0276 R=0.2759 NDCG=0.1856 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3336 NDCG=0.2002 (sampled(1pos+neg))
+Epoch 188 | loss=0.064264
+VAL metrics:
+  K=10: P=0.0275 R=0.2755 NDCG=0.1853 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3331 NDCG=0.1998 (sampled(1pos+neg))
+Epoch 189 | loss=0.066252
+VAL metrics:
+  K=10: P=0.0275 R=0.2755 NDCG=0.1852 (sampled(1pos+neg))
+  K=20: P=0.0167 R=0.3332 NDCG=0.1997 (sampled(1pos+neg))
+Epoch 190 | loss=0.065500
+VAL metrics:
+  K=10: P=0.0276 R=0.2755 NDCG=0.1851 (sampled(1pos+neg))
+  K=20: P=0.0166 R=0.3330 NDCG=0.1995 (sampled(1pos+neg))
+Epoch 191 | loss=0.065160
+VAL metrics:
+  K=10: P=0.0275 R=0.2752 NDCG=0.1848 (sampled(1pos+neg))
+  K=20: P=0.0166 R=0.3329 NDCG=0.1994 (sampled(1pos+neg))
+Epoch 192 | loss=0.063702
+VAL metrics:
+  K=10: P=0.0275 R=0.2748 NDCG=0.1846 (sampled(1pos+neg))
+  K=20: P=0.0166 R=0.3326 NDCG=0.1992 (sampled(1pos+neg))
+Epoch 193 | loss=0.064202
+VAL metrics:
+  K=10: P=0.0275 R=0.2750 NDCG=0.1847 (sampled(1pos+neg))
+  K=20: P=0.0166 R=0.3327 NDCG=0.1992 (sampled(1pos+neg))
+Epoch 194 | loss=0.064893
+VAL metrics:
+  K=10: P=0.0275 R=0.2747 NDCG=0.1845 (sampled(1pos+neg))
+  K=20: P=0.0166 R=0.3325 NDCG=0.1990 (sampled(1pos+neg))
+Epoch 195 | loss=0.064277
+VAL metrics:
+  K=10: P=0.0275 R=0.2745 NDCG=0.1844 (sampled(1pos+neg))
+  K=20: P=0.0166 R=0.3322 NDCG=0.1990 (sampled(1pos+neg))
+Epoch 196 | loss=0.062614
+VAL metrics:
+  K=10: P=0.0275 R=0.2745 NDCG=0.1843 (sampled(1pos+neg))
+  K=20: P=0.0166 R=0.3325 NDCG=0.1989 (sampled(1pos+neg))
+Epoch 197 | loss=0.063460
+VAL metrics:
+  K=10: P=0.0274 R=0.2743 NDCG=0.1842 (sampled(1pos+neg))
+  K=20: P=0.0166 R=0.3322 NDCG=0.1988 (sampled(1pos+neg))
+Epoch 198 | loss=0.061366
+VAL metrics:
+  K=10: P=0.0274 R=0.2743 NDCG=0.1842 (sampled(1pos+neg))
+  K=20: P=0.0166 R=0.3319 NDCG=0.1987 (sampled(1pos+neg))
+Epoch 199 | loss=0.062765
+VAL metrics:
+  K=10: P=0.0274 R=0.2739 NDCG=0.1840 (sampled(1pos+neg))
+  K=20: P=0.0166 R=0.3315 NDCG=0.1985 (sampled(1pos+neg))
+Epoch 200 | loss=0.058747
+VAL metrics:
+  K=10: P=0.0274 R=0.2737 NDCG=0.1840 (sampled(1pos+neg))
+  K=20: P=0.0166 R=0.3313 NDCG=0.1985 (sampled(1pos+neg))
+Epoch 201 | loss=0.059921
+VAL metrics:
+  K=10: P=0.0274 R=0.2736 NDCG=0.1839 (sampled(1pos+neg))
+  K=20: P=0.0166 R=0.3312 NDCG=0.1984 (sampled(1pos+neg))
+Epoch 202 | loss=0.063074
+VAL metrics:
+  K=10: P=0.0273 R=0.2732 NDCG=0.1837 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3309 NDCG=0.1983 (sampled(1pos+neg))
+Epoch 203 | loss=0.059872
+VAL metrics:
+  K=10: P=0.0273 R=0.2733 NDCG=0.1836 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3306 NDCG=0.1980 (sampled(1pos+neg))
+Epoch 204 | loss=0.058847
+VAL metrics:
+  K=10: P=0.0273 R=0.2730 NDCG=0.1834 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3308 NDCG=0.1980 (sampled(1pos+neg))
+Epoch 205 | loss=0.059536
+VAL metrics:
+  K=10: P=0.0273 R=0.2729 NDCG=0.1833 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3308 NDCG=0.1979 (sampled(1pos+neg))
+Epoch 206 | loss=0.058491
+VAL metrics:
+  K=10: P=0.0273 R=0.2727 NDCG=0.1832 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3307 NDCG=0.1978 (sampled(1pos+neg))
+Epoch 207 | loss=0.059092
+VAL metrics:
+  K=10: P=0.0272 R=0.2722 NDCG=0.1830 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3307 NDCG=0.1977 (sampled(1pos+neg))
+Epoch 208 | loss=0.060278
+VAL metrics:
+  K=10: P=0.0272 R=0.2720 NDCG=0.1829 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3306 NDCG=0.1976 (sampled(1pos+neg))
+Epoch 209 | loss=0.057069
+VAL metrics:
+  K=10: P=0.0272 R=0.2718 NDCG=0.1828 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3304 NDCG=0.1975 (sampled(1pos+neg))
+Epoch 210 | loss=0.057636
+VAL metrics:
+  K=10: P=0.0272 R=0.2720 NDCG=0.1829 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3303 NDCG=0.1975 (sampled(1pos+neg))
+Epoch 211 | loss=0.056704
+VAL metrics:
+  K=10: P=0.0272 R=0.2720 NDCG=0.1828 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3300 NDCG=0.1974 (sampled(1pos+neg))
+Epoch 212 | loss=0.054567
+VAL metrics:
+  K=10: P=0.0272 R=0.2721 NDCG=0.1826 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3294 NDCG=0.1971 (sampled(1pos+neg))
+Epoch 213 | loss=0.057155
+VAL metrics:
+  K=10: P=0.0272 R=0.2720 NDCG=0.1825 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3295 NDCG=0.1969 (sampled(1pos+neg))
+Epoch 214 | loss=0.056924
+VAL metrics:
+  K=10: P=0.0272 R=0.2718 NDCG=0.1824 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3294 NDCG=0.1969 (sampled(1pos+neg))
+Epoch 215 | loss=0.057893
+VAL metrics:
+  K=10: P=0.0272 R=0.2716 NDCG=0.1822 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3293 NDCG=0.1968 (sampled(1pos+neg))
+Epoch 216 | loss=0.056249
+VAL metrics:
+  K=10: P=0.0272 R=0.2717 NDCG=0.1822 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3290 NDCG=0.1966 (sampled(1pos+neg))
+Epoch 217 | loss=0.055124
+VAL metrics:
+  K=10: P=0.0272 R=0.2718 NDCG=0.1822 (sampled(1pos+neg))
+  K=20: P=0.0165 R=0.3291 NDCG=0.1967 (sampled(1pos+neg))
+Epoch 218 | loss=0.055485
+VAL metrics:
+  K=10: P=0.0272 R=0.2719 NDCG=0.1822 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3289 NDCG=0.1965 (sampled(1pos+neg))
+Epoch 219 | loss=0.055522
+VAL metrics:
+  K=10: P=0.0272 R=0.2718 NDCG=0.1820 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3289 NDCG=0.1964 (sampled(1pos+neg))
+Epoch 220 | loss=0.054016
+VAL metrics:
+  K=10: P=0.0272 R=0.2716 NDCG=0.1818 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3287 NDCG=0.1962 (sampled(1pos+neg))
+Epoch 221 | loss=0.053187
+VAL metrics:
+  K=10: P=0.0271 R=0.2714 NDCG=0.1817 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3286 NDCG=0.1961 (sampled(1pos+neg))
+Epoch 222 | loss=0.054042
+VAL metrics:
+  K=10: P=0.0271 R=0.2715 NDCG=0.1817 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3286 NDCG=0.1961 (sampled(1pos+neg))
+Epoch 223 | loss=0.054147
+VAL metrics:
+  K=10: P=0.0271 R=0.2715 NDCG=0.1815 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3285 NDCG=0.1958 (sampled(1pos+neg))
+Epoch 224 | loss=0.054007
+VAL metrics:
+  K=10: P=0.0271 R=0.2712 NDCG=0.1813 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3281 NDCG=0.1956 (sampled(1pos+neg))
+Epoch 225 | loss=0.054374
+VAL metrics:
+  K=10: P=0.0271 R=0.2710 NDCG=0.1812 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3281 NDCG=0.1956 (sampled(1pos+neg))
+Epoch 226 | loss=0.053958
+VAL metrics:
+  K=10: P=0.0271 R=0.2712 NDCG=0.1812 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3282 NDCG=0.1955 (sampled(1pos+neg))
+Epoch 227 | loss=0.052993
+VAL metrics:
+  K=10: P=0.0271 R=0.2706 NDCG=0.1809 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3281 NDCG=0.1954 (sampled(1pos+neg))
+Epoch 228 | loss=0.052392
+VAL metrics:
+  K=10: P=0.0271 R=0.2706 NDCG=0.1808 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3280 NDCG=0.1953 (sampled(1pos+neg))
+Epoch 229 | loss=0.052154
+VAL metrics:
+  K=10: P=0.0270 R=0.2702 NDCG=0.1806 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3279 NDCG=0.1951 (sampled(1pos+neg))
+Epoch 230 | loss=0.053992
+VAL metrics:
+  K=10: P=0.0270 R=0.2702 NDCG=0.1806 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3276 NDCG=0.1950 (sampled(1pos+neg))
+Epoch 231 | loss=0.052260
+VAL metrics:
+  K=10: P=0.0270 R=0.2702 NDCG=0.1806 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3273 NDCG=0.1949 (sampled(1pos+neg))
+Epoch 232 | loss=0.051536
+VAL metrics:
+  K=10: P=0.0270 R=0.2697 NDCG=0.1804 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3273 NDCG=0.1949 (sampled(1pos+neg))
+Epoch 233 | loss=0.051763
+VAL metrics:
+  K=10: P=0.0269 R=0.2693 NDCG=0.1802 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3272 NDCG=0.1947 (sampled(1pos+neg))
+Epoch 234 | loss=0.049897
+VAL metrics:
+  K=10: P=0.0269 R=0.2690 NDCG=0.1799 (sampled(1pos+neg))
+  K=20: P=0.0164 R=0.3271 NDCG=0.1945 (sampled(1pos+neg))
+Epoch 235 | loss=0.051505
+VAL metrics:
+  K=10: P=0.0269 R=0.2688 NDCG=0.1796 (sampled(1pos+neg))
+  K=20: P=0.0163 R=0.3267 NDCG=0.1942 (sampled(1pos+neg))
+Epoch 236 | loss=0.049948
+VAL metrics:
+  K=10: P=0.0269 R=0.2686 NDCG=0.1794 (sampled(1pos+neg))
+  K=20: P=0.0163 R=0.3267 NDCG=0.1941 (sampled(1pos+neg))
+Epoch 237 | loss=0.050643
+VAL metrics:
+  K=10: P=0.0268 R=0.2682 NDCG=0.1792 (sampled(1pos+neg))
+  K=20: P=0.0163 R=0.3266 NDCG=0.1939 (sampled(1pos+neg))
+Epoch 238 | loss=0.050859
+VAL metrics:
+  K=10: P=0.0268 R=0.2679 NDCG=0.1789 (sampled(1pos+neg))
+  K=20: P=0.0163 R=0.3261 NDCG=0.1935 (sampled(1pos+neg))
+Epoch 239 | loss=0.050910
+VAL metrics:
+  K=10: P=0.0268 R=0.2680 NDCG=0.1788 (sampled(1pos+neg))
+  K=20: P=0.0163 R=0.3258 NDCG=0.1933 (sampled(1pos+neg))
+Epoch 240 | loss=0.049083
+VAL metrics:
+  K=10: P=0.0268 R=0.2680 NDCG=0.1787 (sampled(1pos+neg))
+  K=20: P=0.0163 R=0.3257 NDCG=0.1932 (sampled(1pos+neg))
+Epoch 241 | loss=0.049019
+VAL metrics:
+  K=10: P=0.0268 R=0.2679 NDCG=0.1786 (sampled(1pos+neg))
+  K=20: P=0.0163 R=0.3252 NDCG=0.1931 (sampled(1pos+neg))
+Epoch 242 | loss=0.049427
+VAL metrics:
+  K=10: P=0.0268 R=0.2675 NDCG=0.1785 (sampled(1pos+neg))
+  K=20: P=0.0163 R=0.3250 NDCG=0.1929 (sampled(1pos+neg))
+Epoch 243 | loss=0.049817
+VAL metrics:
+  K=10: P=0.0267 R=0.2673 NDCG=0.1783 (sampled(1pos+neg))
+  K=20: P=0.0162 R=0.3248 NDCG=0.1928 (sampled(1pos+neg))
+Epoch 244 | loss=0.048339
+VAL metrics:
+  K=10: P=0.0267 R=0.2670 NDCG=0.1781 (sampled(1pos+neg))
+  K=20: P=0.0162 R=0.3248 NDCG=0.1927 (sampled(1pos+neg))
+Epoch 245 | loss=0.049593
+VAL metrics:
+  K=10: P=0.0267 R=0.2667 NDCG=0.1780 (sampled(1pos+neg))
+  K=20: P=0.0162 R=0.3248 NDCG=0.1927 (sampled(1pos+neg))
+Epoch 246 | loss=0.049323
+VAL metrics:
+  K=10: P=0.0267 R=0.2665 NDCG=0.1779 (sampled(1pos+neg))
+  K=20: P=0.0162 R=0.3248 NDCG=0.1925 (sampled(1pos+neg))
+Epoch 247 | loss=0.048567
+VAL metrics:
+  K=10: P=0.0266 R=0.2661 NDCG=0.1776 (sampled(1pos+neg))
+  K=20: P=0.0162 R=0.3241 NDCG=0.1922 (sampled(1pos+neg))
+Epoch 248 | loss=0.048582
+VAL metrics:
+  K=10: P=0.0266 R=0.2657 NDCG=0.1773 (sampled(1pos+neg))
+  K=20: P=0.0162 R=0.3240 NDCG=0.1921 (sampled(1pos+neg))
+Epoch 249 | loss=0.046735
+VAL metrics:
+  K=10: P=0.0266 R=0.2656 NDCG=0.1773 (sampled(1pos+neg))
+  K=20: P=0.0162 R=0.3240 NDCG=0.1920 (sampled(1pos+neg))
+Epoch 250 | loss=0.046920
+VAL metrics:
+  K=10: P=0.0265 R=0.2653 NDCG=0.1772 (sampled(1pos+neg))
+  K=20: P=0.0162 R=0.3239 NDCG=0.1920 (sampled(1pos+neg))
+Epoch 251 | loss=0.048312
+VAL metrics:
+  K=10: P=0.0265 R=0.2650 NDCG=0.1769 (sampled(1pos+neg))
+  K=20: P=0.0162 R=0.3240 NDCG=0.1918 (sampled(1pos+neg))
+Epoch 252 | loss=0.047791
+VAL metrics:
+  K=10: P=0.0265 R=0.2649 NDCG=0.1767 (sampled(1pos+neg))
+  K=20: P=0.0162 R=0.3239 NDCG=0.1916 (sampled(1pos+neg))
+Epoch 253 | loss=0.046029
+VAL metrics:
+  K=10: P=0.0265 R=0.2647 NDCG=0.1765 (sampled(1pos+neg))
+  K=20: P=0.0162 R=0.3235 NDCG=0.1914 (sampled(1pos+neg))
+Epoch 254 | loss=0.046386
+VAL metrics:
+  K=10: P=0.0264 R=0.2645 NDCG=0.1765 (sampled(1pos+neg))
+  K=20: P=0.0161 R=0.3229 NDCG=0.1913 (sampled(1pos+neg))
+Epoch 255 | loss=0.046950
+VAL metrics:
+  K=10: P=0.0264 R=0.2643 NDCG=0.1764 (sampled(1pos+neg))
+  K=20: P=0.0161 R=0.3226 NDCG=0.1911 (sampled(1pos+neg))
+Epoch 256 | loss=0.045374
+VAL metrics:
+  K=10: P=0.0264 R=0.2642 NDCG=0.1762 (sampled(1pos+neg))
+  K=20: P=0.0161 R=0.3226 NDCG=0.1910 (sampled(1pos+neg))
+Epoch 257 | loss=0.046581
+VAL metrics:
+  K=10: P=0.0264 R=0.2640 NDCG=0.1762 (sampled(1pos+neg))
+  K=20: P=0.0161 R=0.3224 NDCG=0.1909 (sampled(1pos+neg))
+Epoch 258 | loss=0.044582
+VAL metrics:
+  K=10: P=0.0264 R=0.2639 NDCG=0.1761 (sampled(1pos+neg))
+  K=20: P=0.0161 R=0.3221 NDCG=0.1908 (sampled(1pos+neg))
+Epoch 259 | loss=0.044883
+VAL metrics:
+  K=10: P=0.0264 R=0.2639 NDCG=0.1760 (sampled(1pos+neg))
+  K=20: P=0.0161 R=0.3221 NDCG=0.1907 (sampled(1pos+neg))
+Epoch 260 | loss=0.044441
+VAL metrics:
+  K=10: P=0.0264 R=0.2641 NDCG=0.1759 (sampled(1pos+neg))
+  K=20: P=0.0161 R=0.3217 NDCG=0.1905 (sampled(1pos+neg))
+Epoch 261 | loss=0.045163
+VAL metrics:
+  K=10: P=0.0264 R=0.2638 NDCG=0.1758 (sampled(1pos+neg))
+  K=20: P=0.0161 R=0.3217 NDCG=0.1904 (sampled(1pos+neg))
+Epoch 262 | loss=0.044489
+VAL metrics:
+  K=10: P=0.0264 R=0.2637 NDCG=0.1757 (sampled(1pos+neg))
+  K=20: P=0.0161 R=0.3217 NDCG=0.1904 (sampled(1pos+neg))
+Epoch 263 | loss=0.045081
+VAL metrics:
+  K=10: P=0.0263 R=0.2635 NDCG=0.1755 (sampled(1pos+neg))
+  K=20: P=0.0161 R=0.3214 NDCG=0.1902 (sampled(1pos+neg))
+Epoch 264 | loss=0.043969
+VAL metrics:
+  K=10: P=0.0263 R=0.2633 NDCG=0.1754 (sampled(1pos+neg))
+  K=20: P=0.0161 R=0.3214 NDCG=0.1900 (sampled(1pos+neg))
+Epoch 265 | loss=0.044157
+VAL metrics:
+  K=10: P=0.0263 R=0.2632 NDCG=0.1751 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3208 NDCG=0.1897 (sampled(1pos+neg))
+Epoch 266 | loss=0.042496
+VAL metrics:
+  K=10: P=0.0263 R=0.2628 NDCG=0.1750 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3208 NDCG=0.1897 (sampled(1pos+neg))
+Epoch 267 | loss=0.043597
+VAL metrics:
+  K=10: P=0.0263 R=0.2627 NDCG=0.1748 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3206 NDCG=0.1895 (sampled(1pos+neg))
+Epoch 268 | loss=0.044924
+VAL metrics:
+  K=10: P=0.0262 R=0.2621 NDCG=0.1746 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3208 NDCG=0.1894 (sampled(1pos+neg))
+Epoch 269 | loss=0.043722
+VAL metrics:
+  K=10: P=0.0262 R=0.2618 NDCG=0.1743 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3203 NDCG=0.1891 (sampled(1pos+neg))
+Epoch 270 | loss=0.042389
+VAL metrics:
+  K=10: P=0.0262 R=0.2618 NDCG=0.1742 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3204 NDCG=0.1891 (sampled(1pos+neg))
+Epoch 271 | loss=0.041529
+VAL metrics:
+  K=10: P=0.0261 R=0.2615 NDCG=0.1741 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3202 NDCG=0.1890 (sampled(1pos+neg))
+Epoch 272 | loss=0.042715
+VAL metrics:
+  K=10: P=0.0261 R=0.2613 NDCG=0.1740 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3200 NDCG=0.1889 (sampled(1pos+neg))
+Epoch 273 | loss=0.042220
+VAL metrics:
+  K=10: P=0.0261 R=0.2614 NDCG=0.1740 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3201 NDCG=0.1888 (sampled(1pos+neg))
+Epoch 274 | loss=0.042001
+VAL metrics:
+  K=10: P=0.0261 R=0.2613 NDCG=0.1740 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3202 NDCG=0.1888 (sampled(1pos+neg))
+Epoch 275 | loss=0.041225
+VAL metrics:
+  K=10: P=0.0261 R=0.2610 NDCG=0.1737 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3201 NDCG=0.1887 (sampled(1pos+neg))
+Epoch 276 | loss=0.042612
+VAL metrics:
+  K=10: P=0.0261 R=0.2610 NDCG=0.1736 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3201 NDCG=0.1885 (sampled(1pos+neg))
+Epoch 277 | loss=0.040998
+VAL metrics:
+  K=10: P=0.0261 R=0.2606 NDCG=0.1734 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3201 NDCG=0.1884 (sampled(1pos+neg))
+Epoch 278 | loss=0.041070
+VAL metrics:
+  K=10: P=0.0260 R=0.2603 NDCG=0.1733 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3197 NDCG=0.1883 (sampled(1pos+neg))
+Epoch 279 | loss=0.041327
+VAL metrics:
+  K=10: P=0.0260 R=0.2601 NDCG=0.1731 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3198 NDCG=0.1882 (sampled(1pos+neg))
+Epoch 280 | loss=0.039580
+VAL metrics:
+  K=10: P=0.0260 R=0.2597 NDCG=0.1729 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3197 NDCG=0.1880 (sampled(1pos+neg))
+Epoch 281 | loss=0.040951
+VAL metrics:
+  K=10: P=0.0259 R=0.2595 NDCG=0.1727 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3195 NDCG=0.1879 (sampled(1pos+neg))
+Epoch 282 | loss=0.041329
+VAL metrics:
+  K=10: P=0.0259 R=0.2592 NDCG=0.1726 (sampled(1pos+neg))
+  K=20: P=0.0160 R=0.3192 NDCG=0.1878 (sampled(1pos+neg))
+Epoch 283 | loss=0.041051
+VAL metrics:
+  K=10: P=0.0259 R=0.2589 NDCG=0.1724 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3189 NDCG=0.1876 (sampled(1pos+neg))
+Epoch 284 | loss=0.041592
+VAL metrics:
+  K=10: P=0.0259 R=0.2589 NDCG=0.1723 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3188 NDCG=0.1875 (sampled(1pos+neg))
+Epoch 285 | loss=0.039800
+VAL metrics:
+  K=10: P=0.0259 R=0.2587 NDCG=0.1723 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3185 NDCG=0.1874 (sampled(1pos+neg))
+Epoch 286 | loss=0.039863
+VAL metrics:
+  K=10: P=0.0259 R=0.2586 NDCG=0.1720 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3185 NDCG=0.1872 (sampled(1pos+neg))
+Epoch 287 | loss=0.039312
+VAL metrics:
+  K=10: P=0.0258 R=0.2584 NDCG=0.1719 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3186 NDCG=0.1871 (sampled(1pos+neg))
+Epoch 288 | loss=0.039279
+VAL metrics:
+  K=10: P=0.0258 R=0.2582 NDCG=0.1719 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3186 NDCG=0.1872 (sampled(1pos+neg))
+Epoch 289 | loss=0.038439
+VAL metrics:
+  K=10: P=0.0258 R=0.2580 NDCG=0.1718 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3184 NDCG=0.1870 (sampled(1pos+neg))
+Epoch 290 | loss=0.039464
+VAL metrics:
+  K=10: P=0.0258 R=0.2579 NDCG=0.1717 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3183 NDCG=0.1869 (sampled(1pos+neg))
+Epoch 291 | loss=0.039386
+VAL metrics:
+  K=10: P=0.0257 R=0.2573 NDCG=0.1714 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3184 NDCG=0.1868 (sampled(1pos+neg))
+Epoch 292 | loss=0.037698
+VAL metrics:
+  K=10: P=0.0257 R=0.2572 NDCG=0.1713 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3183 NDCG=0.1867 (sampled(1pos+neg))
+Epoch 293 | loss=0.038160
+VAL metrics:
+  K=10: P=0.0257 R=0.2573 NDCG=0.1712 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3179 NDCG=0.1866 (sampled(1pos+neg))
+Epoch 294 | loss=0.039104
+VAL metrics:
+  K=10: P=0.0257 R=0.2570 NDCG=0.1710 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3175 NDCG=0.1863 (sampled(1pos+neg))
+Epoch 295 | loss=0.038530
+VAL metrics:
+  K=10: P=0.0257 R=0.2570 NDCG=0.1710 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3177 NDCG=0.1863 (sampled(1pos+neg))
+Epoch 296 | loss=0.038132
+VAL metrics:
+  K=10: P=0.0257 R=0.2570 NDCG=0.1709 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3176 NDCG=0.1862 (sampled(1pos+neg))
+Epoch 297 | loss=0.036974
+VAL metrics:
+  K=10: P=0.0257 R=0.2566 NDCG=0.1707 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3174 NDCG=0.1860 (sampled(1pos+neg))
+Epoch 298 | loss=0.036764
+VAL metrics:
+  K=10: P=0.0257 R=0.2566 NDCG=0.1707 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3174 NDCG=0.1860 (sampled(1pos+neg))
+Epoch 299 | loss=0.038163
+VAL metrics:
+  K=10: P=0.0257 R=0.2566 NDCG=0.1706 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3173 NDCG=0.1859 (sampled(1pos+neg))
+Epoch 300 | loss=0.036651
+VAL metrics:
+  K=10: P=0.0256 R=0.2564 NDCG=0.1705 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3170 NDCG=0.1858 (sampled(1pos+neg))
+Epoch 301 | loss=0.035805
+VAL metrics:
+  K=10: P=0.0257 R=0.2566 NDCG=0.1705 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3171 NDCG=0.1858 (sampled(1pos+neg))
+Epoch 302 | loss=0.035673
+VAL metrics:
+  K=10: P=0.0257 R=0.2567 NDCG=0.1704 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3171 NDCG=0.1857 (sampled(1pos+neg))
+Epoch 303 | loss=0.038555
+VAL metrics:
+  K=10: P=0.0257 R=0.2565 NDCG=0.1704 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3169 NDCG=0.1856 (sampled(1pos+neg))
+Epoch 304 | loss=0.036624
+VAL metrics:
+  K=10: P=0.0256 R=0.2564 NDCG=0.1703 (sampled(1pos+neg))
+  K=20: P=0.0159 R=0.3171 NDCG=0.1856 (sampled(1pos+neg))
+Epoch 305 | loss=0.035995
+VAL metrics:
+  K=10: P=0.0256 R=0.2561 NDCG=0.1701 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3164 NDCG=0.1853 (sampled(1pos+neg))
+Epoch 306 | loss=0.037089
+VAL metrics:
+  K=10: P=0.0256 R=0.2558 NDCG=0.1698 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3164 NDCG=0.1851 (sampled(1pos+neg))
+Epoch 307 | loss=0.036193
+VAL metrics:
+  K=10: P=0.0256 R=0.2559 NDCG=0.1697 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3161 NDCG=0.1849 (sampled(1pos+neg))
+Epoch 308 | loss=0.037349
+VAL metrics:
+  K=10: P=0.0256 R=0.2556 NDCG=0.1695 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3161 NDCG=0.1848 (sampled(1pos+neg))
+Epoch 309 | loss=0.035624
+VAL metrics:
+  K=10: P=0.0256 R=0.2555 NDCG=0.1694 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3164 NDCG=0.1848 (sampled(1pos+neg))
+Epoch 310 | loss=0.035963
+VAL metrics:
+  K=10: P=0.0255 R=0.2554 NDCG=0.1694 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3164 NDCG=0.1847 (sampled(1pos+neg))
+Epoch 311 | loss=0.033902
+VAL metrics:
+  K=10: P=0.0255 R=0.2549 NDCG=0.1692 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3164 NDCG=0.1847 (sampled(1pos+neg))
+Epoch 312 | loss=0.035999
+VAL metrics:
+  K=10: P=0.0255 R=0.2546 NDCG=0.1690 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3161 NDCG=0.1844 (sampled(1pos+neg))
+Epoch 313 | loss=0.035596
+VAL metrics:
+  K=10: P=0.0254 R=0.2545 NDCG=0.1688 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3160 NDCG=0.1843 (sampled(1pos+neg))
+Epoch 314 | loss=0.037254
+VAL metrics:
+  K=10: P=0.0254 R=0.2544 NDCG=0.1687 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3157 NDCG=0.1842 (sampled(1pos+neg))
+Epoch 315 | loss=0.035152
+VAL metrics:
+  K=10: P=0.0254 R=0.2541 NDCG=0.1686 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3155 NDCG=0.1840 (sampled(1pos+neg))
+Epoch 316 | loss=0.034554
+VAL metrics:
+  K=10: P=0.0254 R=0.2540 NDCG=0.1685 (sampled(1pos+neg))
+  K=20: P=0.0158 R=0.3152 NDCG=0.1839 (sampled(1pos+neg))
+Epoch 317 | loss=0.035559
+VAL metrics:
+  K=10: P=0.0254 R=0.2538 NDCG=0.1684 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3149 NDCG=0.1838 (sampled(1pos+neg))
+Epoch 318 | loss=0.033730
+VAL metrics:
+  K=10: P=0.0254 R=0.2535 NDCG=0.1682 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3146 NDCG=0.1836 (sampled(1pos+neg))
+Epoch 319 | loss=0.032676
+VAL metrics:
+  K=10: P=0.0253 R=0.2533 NDCG=0.1680 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3146 NDCG=0.1835 (sampled(1pos+neg))
+Epoch 320 | loss=0.033237
+VAL metrics:
+  K=10: P=0.0253 R=0.2532 NDCG=0.1680 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3143 NDCG=0.1834 (sampled(1pos+neg))
+Epoch 321 | loss=0.032366
+VAL metrics:
+  K=10: P=0.0253 R=0.2531 NDCG=0.1678 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3139 NDCG=0.1831 (sampled(1pos+neg))
+Epoch 322 | loss=0.032370
+VAL metrics:
+  K=10: P=0.0253 R=0.2532 NDCG=0.1677 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3139 NDCG=0.1830 (sampled(1pos+neg))
+Epoch 323 | loss=0.032150
+VAL metrics:
+  K=10: P=0.0253 R=0.2529 NDCG=0.1676 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3138 NDCG=0.1829 (sampled(1pos+neg))
+Epoch 324 | loss=0.033057
+VAL metrics:
+  K=10: P=0.0253 R=0.2526 NDCG=0.1673 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3135 NDCG=0.1826 (sampled(1pos+neg))
+Epoch 325 | loss=0.033090
+VAL metrics:
+  K=10: P=0.0252 R=0.2525 NDCG=0.1672 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3137 NDCG=0.1826 (sampled(1pos+neg))
+Epoch 326 | loss=0.032488
+VAL metrics:
+  K=10: P=0.0252 R=0.2521 NDCG=0.1670 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3136 NDCG=0.1824 (sampled(1pos+neg))
+Epoch 327 | loss=0.032412
+VAL metrics:
+  K=10: P=0.0252 R=0.2520 NDCG=0.1669 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3134 NDCG=0.1824 (sampled(1pos+neg))
+Epoch 328 | loss=0.034044
+VAL metrics:
+  K=10: P=0.0252 R=0.2520 NDCG=0.1670 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3131 NDCG=0.1824 (sampled(1pos+neg))
+Epoch 329 | loss=0.031953
+VAL metrics:
+  K=10: P=0.0252 R=0.2518 NDCG=0.1668 (sampled(1pos+neg))
+  K=20: P=0.0157 R=0.3131 NDCG=0.1822 (sampled(1pos+neg))
+Epoch 330 | loss=0.032422
+VAL metrics:
+  K=10: P=0.0252 R=0.2515 NDCG=0.1666 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3126 NDCG=0.1820 (sampled(1pos+neg))
+Epoch 331 | loss=0.031774
+VAL metrics:
+  K=10: P=0.0252 R=0.2515 NDCG=0.1665 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3126 NDCG=0.1819 (sampled(1pos+neg))
+Epoch 332 | loss=0.033017
+VAL metrics:
+  K=10: P=0.0251 R=0.2514 NDCG=0.1664 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3128 NDCG=0.1819 (sampled(1pos+neg))
+Epoch 333 | loss=0.031648
+VAL metrics:
+  K=10: P=0.0251 R=0.2512 NDCG=0.1662 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3125 NDCG=0.1816 (sampled(1pos+neg))
+Epoch 334 | loss=0.031220
+VAL metrics:
+  K=10: P=0.0251 R=0.2509 NDCG=0.1659 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3124 NDCG=0.1814 (sampled(1pos+neg))
+Epoch 335 | loss=0.031297
+VAL metrics:
+  K=10: P=0.0251 R=0.2507 NDCG=0.1658 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3123 NDCG=0.1813 (sampled(1pos+neg))
+Epoch 336 | loss=0.032279
+VAL metrics:
+  K=10: P=0.0251 R=0.2506 NDCG=0.1657 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3123 NDCG=0.1812 (sampled(1pos+neg))
+Epoch 337 | loss=0.031385
+VAL metrics:
+  K=10: P=0.0251 R=0.2505 NDCG=0.1656 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3123 NDCG=0.1812 (sampled(1pos+neg))
+Epoch 338 | loss=0.032091
+VAL metrics:
+  K=10: P=0.0250 R=0.2503 NDCG=0.1655 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3121 NDCG=0.1810 (sampled(1pos+neg))
+Epoch 339 | loss=0.031856
+VAL metrics:
+  K=10: P=0.0250 R=0.2500 NDCG=0.1653 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3120 NDCG=0.1809 (sampled(1pos+neg))
+Epoch 340 | loss=0.030923
+VAL metrics:
+  K=10: P=0.0250 R=0.2499 NDCG=0.1651 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3116 NDCG=0.1806 (sampled(1pos+neg))
+Epoch 341 | loss=0.031179
+VAL metrics:
+  K=10: P=0.0250 R=0.2498 NDCG=0.1650 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3116 NDCG=0.1805 (sampled(1pos+neg))
+Epoch 342 | loss=0.031250
+VAL metrics:
+  K=10: P=0.0250 R=0.2498 NDCG=0.1648 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3114 NDCG=0.1803 (sampled(1pos+neg))
+Epoch 343 | loss=0.031637
+VAL metrics:
+  K=10: P=0.0250 R=0.2498 NDCG=0.1647 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3113 NDCG=0.1802 (sampled(1pos+neg))
+Epoch 344 | loss=0.030813
+VAL metrics:
+  K=10: P=0.0250 R=0.2496 NDCG=0.1647 (sampled(1pos+neg))
+  K=20: P=0.0156 R=0.3110 NDCG=0.1801 (sampled(1pos+neg))
+Epoch 345 | loss=0.029566
+VAL metrics:
+  K=10: P=0.0249 R=0.2494 NDCG=0.1645 (sampled(1pos+neg))
+  K=20: P=0.0155 R=0.3106 NDCG=0.1799 (sampled(1pos+neg))
+Epoch 346 | loss=0.030647
+VAL metrics:
+  K=10: P=0.0249 R=0.2491 NDCG=0.1643 (sampled(1pos+neg))
+  K=20: P=0.0155 R=0.3108 NDCG=0.1799 (sampled(1pos+neg))
+Epoch 347 | loss=0.030226
+VAL metrics:
+  K=10: P=0.0249 R=0.2489 NDCG=0.1643 (sampled(1pos+neg))
+  K=20: P=0.0155 R=0.3106 NDCG=0.1798 (sampled(1pos+neg))
+Epoch 348 | loss=0.031008
+VAL metrics:
+  K=10: P=0.0249 R=0.2486 NDCG=0.1641 (sampled(1pos+neg))
+  K=20: P=0.0155 R=0.3102 NDCG=0.1796 (sampled(1pos+neg))
+Epoch 349 | loss=0.029982
+VAL metrics:
+  K=10: P=0.0248 R=0.2483 NDCG=0.1639 (sampled(1pos+neg))
+  K=20: P=0.0155 R=0.3098 NDCG=0.1794 (sampled(1pos+neg))
+Epoch 350 | loss=0.029610
+VAL metrics:
+  K=10: P=0.0248 R=0.2482 NDCG=0.1638 (sampled(1pos+neg))
+  K=20: P=0.0155 R=0.3094 NDCG=0.1792 (sampled(1pos+neg))
+Epoch 351 | loss=0.029756
+VAL metrics:
+  K=10: P=0.0248 R=0.2478 NDCG=0.1636 (sampled(1pos+neg))
+  K=20: P=0.0155 R=0.3094 NDCG=0.1791 (sampled(1pos+neg))
+Epoch 352 | loss=0.029369
+VAL metrics:
+  K=10: P=0.0248 R=0.2477 NDCG=0.1634 (sampled(1pos+neg))
+  K=20: P=0.0155 R=0.3091 NDCG=0.1789 (sampled(1pos+neg))
+Epoch 353 | loss=0.029713
+VAL metrics:
+  K=10: P=0.0248 R=0.2477 NDCG=0.1633 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3090 NDCG=0.1787 (sampled(1pos+neg))
+Epoch 354 | loss=0.030277
+VAL metrics:
+  K=10: P=0.0247 R=0.2473 NDCG=0.1632 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3090 NDCG=0.1787 (sampled(1pos+neg))
+Epoch 355 | loss=0.030672
+VAL metrics:
+  K=10: P=0.0247 R=0.2469 NDCG=0.1629 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3087 NDCG=0.1785 (sampled(1pos+neg))
+Epoch 356 | loss=0.028981
+VAL metrics:
+  K=10: P=0.0247 R=0.2468 NDCG=0.1628 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3083 NDCG=0.1783 (sampled(1pos+neg))
+Epoch 357 | loss=0.028438
+VAL metrics:
+  K=10: P=0.0246 R=0.2463 NDCG=0.1625 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3082 NDCG=0.1781 (sampled(1pos+neg))
+Epoch 358 | loss=0.028850
+VAL metrics:
+  K=10: P=0.0246 R=0.2463 NDCG=0.1624 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3080 NDCG=0.1780 (sampled(1pos+neg))
+Epoch 359 | loss=0.028769
+VAL metrics:
+  K=10: P=0.0246 R=0.2461 NDCG=0.1623 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3080 NDCG=0.1779 (sampled(1pos+neg))
+Epoch 360 | loss=0.028521
+VAL metrics:
+  K=10: P=0.0246 R=0.2460 NDCG=0.1622 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3079 NDCG=0.1778 (sampled(1pos+neg))
+Epoch 361 | loss=0.027676
+VAL metrics:
+  K=10: P=0.0246 R=0.2458 NDCG=0.1620 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3079 NDCG=0.1777 (sampled(1pos+neg))
+Epoch 362 | loss=0.028928
+VAL metrics:
+  K=10: P=0.0245 R=0.2455 NDCG=0.1618 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3079 NDCG=0.1775 (sampled(1pos+neg))
+Epoch 363 | loss=0.028131
+VAL metrics:
+  K=10: P=0.0246 R=0.2457 NDCG=0.1618 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3077 NDCG=0.1774 (sampled(1pos+neg))
+Epoch 364 | loss=0.029765
+VAL metrics:
+  K=10: P=0.0246 R=0.2456 NDCG=0.1615 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3078 NDCG=0.1772 (sampled(1pos+neg))
+Epoch 365 | loss=0.027234
+VAL metrics:
+  K=10: P=0.0245 R=0.2454 NDCG=0.1615 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3077 NDCG=0.1772 (sampled(1pos+neg))
+Epoch 366 | loss=0.027975
+VAL metrics:
+  K=10: P=0.0245 R=0.2450 NDCG=0.1614 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3075 NDCG=0.1772 (sampled(1pos+neg))
+Epoch 367 | loss=0.027550
+VAL metrics:
+  K=10: P=0.0245 R=0.2450 NDCG=0.1614 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3072 NDCG=0.1771 (sampled(1pos+neg))
+Epoch 368 | loss=0.027575
+VAL metrics:
+  K=10: P=0.0245 R=0.2448 NDCG=0.1612 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3073 NDCG=0.1770 (sampled(1pos+neg))
+Epoch 369 | loss=0.027257
+VAL metrics:
+  K=10: P=0.0245 R=0.2446 NDCG=0.1611 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3070 NDCG=0.1768 (sampled(1pos+neg))
+Epoch 370 | loss=0.026119
+VAL metrics:
+  K=10: P=0.0244 R=0.2445 NDCG=0.1609 (sampled(1pos+neg))
+  K=20: P=0.0154 R=0.3071 NDCG=0.1767 (sampled(1pos+neg))
+Epoch 371 | loss=0.027311
+VAL metrics:
+  K=10: P=0.0245 R=0.2448 NDCG=0.1610 (sampled(1pos+neg))
+  K=20: P=0.0153 R=0.3067 NDCG=0.1766 (sampled(1pos+neg))
+Epoch 372 | loss=0.028312
+VAL metrics:
+  K=10: P=0.0245 R=0.2445 NDCG=0.1609 (sampled(1pos+neg))
+  K=20: P=0.0153 R=0.3064 NDCG=0.1765 (sampled(1pos+neg))
+Epoch 373 | loss=0.026486
+VAL metrics:
+  K=10: P=0.0244 R=0.2441 NDCG=0.1606 (sampled(1pos+neg))
+  K=20: P=0.0153 R=0.3062 NDCG=0.1762 (sampled(1pos+neg))
+Epoch 374 | loss=0.026355
+VAL metrics:
+  K=10: P=0.0244 R=0.2441 NDCG=0.1605 (sampled(1pos+neg))
+  K=20: P=0.0153 R=0.3060 NDCG=0.1761 (sampled(1pos+neg))
+Epoch 375 | loss=0.025762
+VAL metrics:
+  K=10: P=0.0244 R=0.2440 NDCG=0.1603 (sampled(1pos+neg))
+  K=20: P=0.0153 R=0.3059 NDCG=0.1759 (sampled(1pos+neg))
+Epoch 376 | loss=0.026392
+VAL metrics:
+  K=10: P=0.0244 R=0.2439 NDCG=0.1602 (sampled(1pos+neg))
+  K=20: P=0.0153 R=0.3059 NDCG=0.1758 (sampled(1pos+neg))
+Epoch 377 | loss=0.025677
+VAL metrics:
+  K=10: P=0.0244 R=0.2438 NDCG=0.1602 (sampled(1pos+neg))
+  K=20: P=0.0153 R=0.3057 NDCG=0.1758 (sampled(1pos+neg))
+Epoch 378 | loss=0.025742
+VAL metrics:
+  K=10: P=0.0243 R=0.2434 NDCG=0.1599 (sampled(1pos+neg))
+  K=20: P=0.0153 R=0.3056 NDCG=0.1756 (sampled(1pos+neg))
+Epoch 379 | loss=0.026039
+VAL metrics:
+  K=10: P=0.0244 R=0.2436 NDCG=0.1600 (sampled(1pos+neg))
+  K=20: P=0.0153 R=0.3054 NDCG=0.1755 (sampled(1pos+neg))
+Epoch 380 | loss=0.026237
+VAL metrics:
+  K=10: P=0.0243 R=0.2435 NDCG=0.1597 (sampled(1pos+neg))
+  K=20: P=0.0153 R=0.3055 NDCG=0.1754 (sampled(1pos+neg))
+Epoch 381 | loss=0.026362
+VAL metrics:
+  K=10: P=0.0244 R=0.2436 NDCG=0.1598 (sampled(1pos+neg))
+  K=20: P=0.0153 R=0.3055 NDCG=0.1753 (sampled(1pos+neg))
+Epoch 382 | loss=0.027264
+VAL metrics:
+  K=10: P=0.0244 R=0.2436 NDCG=0.1597 (sampled(1pos+neg))
+  K=20: P=0.0153 R=0.3053 NDCG=0.1753 (sampled(1pos+neg))
+Epoch 383 | loss=0.025938
+VAL metrics:
+  K=10: P=0.0244 R=0.2436 NDCG=0.1596 (sampled(1pos+neg))
+  K=20: P=0.0152 R=0.3048 NDCG=0.1750 (sampled(1pos+neg))
+Epoch 384 | loss=0.024478
+VAL metrics:
+  K=10: P=0.0243 R=0.2433 NDCG=0.1594 (sampled(1pos+neg))
+  K=20: P=0.0152 R=0.3047 NDCG=0.1749 (sampled(1pos+neg))
+Epoch 385 | loss=0.026518
+VAL metrics:
+  K=10: P=0.0243 R=0.2430 NDCG=0.1592 (sampled(1pos+neg))
+  K=20: P=0.0152 R=0.3047 NDCG=0.1748 (sampled(1pos+neg))
+Epoch 386 | loss=0.025878
+VAL metrics:
+  K=10: P=0.0243 R=0.2429 NDCG=0.1592 (sampled(1pos+neg))
+  K=20: P=0.0152 R=0.3044 NDCG=0.1747 (sampled(1pos+neg))
+Epoch 387 | loss=0.024357
+VAL metrics:
+  K=10: P=0.0243 R=0.2427 NDCG=0.1591 (sampled(1pos+neg))
+  K=20: P=0.0152 R=0.3044 NDCG=0.1746 (sampled(1pos+neg))
+Epoch 388 | loss=0.025210
+VAL metrics:
+  K=10: P=0.0243 R=0.2427 NDCG=0.1590 (sampled(1pos+neg))
+  K=20: P=0.0152 R=0.3044 NDCG=0.1745 (sampled(1pos+neg))
+Epoch 389 | loss=0.025345
+VAL metrics:
+  K=10: P=0.0243 R=0.2426 NDCG=0.1589 (sampled(1pos+neg))
+  K=20: P=0.0152 R=0.3041 NDCG=0.1744 (sampled(1pos+neg))
+Epoch 390 | loss=0.025593
+VAL metrics:
+  K=10: P=0.0242 R=0.2425 NDCG=0.1587 (sampled(1pos+neg))
+  K=20: P=0.0152 R=0.3041 NDCG=0.1742 (sampled(1pos+neg))
+Epoch 391 | loss=0.025592
+VAL metrics:
+  K=10: P=0.0242 R=0.2422 NDCG=0.1584 (sampled(1pos+neg))
+  K=20: P=0.0152 R=0.3038 NDCG=0.1739 (sampled(1pos+neg))
+Epoch 392 | loss=0.025370
+VAL metrics:
+  K=10: P=0.0242 R=0.2421 NDCG=0.1582 (sampled(1pos+neg))
+  K=20: P=0.0152 R=0.3036 NDCG=0.1737 (sampled(1pos+neg))
+Epoch 393 | loss=0.024722
+VAL metrics:
+  K=10: P=0.0242 R=0.2421 NDCG=0.1582 (sampled(1pos+neg))
+  K=20: P=0.0152 R=0.3033 NDCG=0.1736 (sampled(1pos+neg))
+Epoch 394 | loss=0.024310
+VAL metrics:
+  K=10: P=0.0242 R=0.2417 NDCG=0.1580 (sampled(1pos+neg))
+  K=20: P=0.0152 R=0.3031 NDCG=0.1735 (sampled(1pos+neg))
+Epoch 395 | loss=0.024970
+VAL metrics:
+  K=10: P=0.0241 R=0.2415 NDCG=0.1579 (sampled(1pos+neg))
+  K=20: P=0.0151 R=0.3028 NDCG=0.1734 (sampled(1pos+neg))
+Epoch 396 | loss=0.024110
+VAL metrics:
+  K=10: P=0.0241 R=0.2414 NDCG=0.1578 (sampled(1pos+neg))
+  K=20: P=0.0151 R=0.3028 NDCG=0.1732 (sampled(1pos+neg))
+Epoch 397 | loss=0.024522
+VAL metrics:
+  K=10: P=0.0241 R=0.2414 NDCG=0.1577 (sampled(1pos+neg))
+  K=20: P=0.0151 R=0.3027 NDCG=0.1731 (sampled(1pos+neg))
+Epoch 398 | loss=0.025515
+VAL metrics:
+  K=10: P=0.0241 R=0.2414 NDCG=0.1576 (sampled(1pos+neg))
+  K=20: P=0.0151 R=0.3025 NDCG=0.1730 (sampled(1pos+neg))
+Epoch 399 | loss=0.024261
+VAL metrics:
+  K=10: P=0.0241 R=0.2413 NDCG=0.1575 (sampled(1pos+neg))
+  K=20: P=0.0151 R=0.3024 NDCG=0.1729 (sampled(1pos+neg))
+Epoch 400 | loss=0.024709
+VAL metrics:
+  K=10: P=0.0241 R=0.2412 NDCG=0.1573 (sampled(1pos+neg))
+  K=20: P=0.0151 R=0.3020 NDCG=0.1726 (sampled(1pos+neg))
+
+TEST metrics:
+  K=10: P=0.0303 R=0.3034 NDCG=0.2045 (sampled(1pos+neg))
+  K=20: P=0.0183 R=0.3669 NDCG=0.2205 (sampled(1pos+neg))
